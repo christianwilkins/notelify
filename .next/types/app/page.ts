@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // File: C:\Users\chris\Desktop\notelify\src\app\page.tsx
+=======
+// File: C:\Users\vishe\OneDrive\Desktop\notelify\src\app\page.tsx
+>>>>>>> 64f355ca14ce0f1b9e67123f42a72ce538ce8e2a
 import * as entry from '../../../src/app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
