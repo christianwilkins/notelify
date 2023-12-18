@@ -1,3 +1,4 @@
+/*
 "use client";
 import React, { useEffect } from "react";
 import SideBar from "@/components/SideBar";
@@ -116,3 +117,5 @@ export default function Donation() {
     </>
   );
 }
+
+*/
