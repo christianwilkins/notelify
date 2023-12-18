@@ -47,11 +47,6 @@
 /******/ 	__webpack_require__.m = __webpack_modules__;
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/amd options */
-/******/ 	(() => {
-/******/ 		__webpack_require__.amdO = {};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
@@ -130,11 +125,7 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
-<<<<<<< HEAD
-/******/ 		__webpack_require__.h = () => ("96eaed1de6143b5b")
-=======
-/******/ 		__webpack_require__.h = () => ("0cc6f650dce26b3e")
->>>>>>> 64f355ca14ce0f1b9e67123f42a72ce538ce8e2a
+/******/ 		__webpack_require__.h = () => ("46423f3966bdbd62")
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
