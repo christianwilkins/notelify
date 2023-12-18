@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <button onclick="startTranscription()">Start Transcription</button>
+  <button onclick="stopTranscription()">Stop Transcription</button>
+  <button onclick="clearTranscription()">Clear Transcription</button>
+ <!-- <button onclick="saveToDatabase()">Save to Database</button> -->
+  <div id="transcript"></div>
+
+  <script>
+    var recognition;
+    var finalTranscript = '';
+
+    function startTranscription() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert('Your browser does not support the Web Speech API. Please try another browser.');
+      } else {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = function(event) {
+          var interimTranscript = '';
+          for (var i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+          document.getElementById('transcript').innerText = finalTranscript + ' ' + interimTranscript;
+        };
+
+        recognition.start();
+      }
+    }
+
+    function stopTranscription() {
+      if (recognition) {
+        recognition.stop();
+      }
+    }
+
+    function clearTranscription() {
+      finalTranscript = '';
+      document.getElementById('transcript').innerText = '';
+    }
+
+    function clearTranscription() {
+      document.getElementById('transcript').innerText = '';
+    }
+
+    //function saveToDatabase() {
+    //  var transcript = document.getElementById('transcript').innerText;
+    //  console.log('Saving the following transcript to the database: ' + transcript);
+   // }  -->
+  </script>
+</body>
+</html>
