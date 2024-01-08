@@ -4,6 +4,7 @@ import React from "react";
 
 export default function SideBar() {
   const [expanded, setExpanded] = useState(true);
+  const [showRestoreButton, setShowRestoreButton] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   const toggleSidebar = () => {
@@ -15,7 +16,13 @@ export default function SideBar() {
 
     if (expanded && sidebar && !sidebar.contains(event.target as Node)) {
       setExpanded(false);
+      setShowRestoreButton(true);
     }
+  };
+
+  const restoreSidebar = () => {
+    setExpanded(true);
+    setShowRestoreButton(false);
   };
 
   useEffect(() => {
@@ -521,6 +528,15 @@ export default function SideBar() {
           </ul>
         </nav>
       </div>
+      {showRestoreButton && (
+        <button
+          type="button"
+          className="fixed bottom-4 start-4 bg-gray-500 text-white px-4 py-2 rounded-md"
+          onClick={restoreSidebar}
+        >
+          Restore Sidebar
+        </button>
+      )}
     </>
   );
 }
