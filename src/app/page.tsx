@@ -20,7 +20,7 @@ export default function Home() {
     script.setAttribute("data-color", "#FF5F5F");
     script.setAttribute("data-position", "right");
     script.setAttribute("data-x_margin", "18");
-    script.setAttribute("data-y-margin", "18");
+    script.setAttribute("data-y_margin", "18")
     script.async = true;
     script.onload = function () {
       var evt = document.createEvent("Event");
