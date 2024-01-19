@@ -1,16 +1,25 @@
 import { OpenAI } from "openai";
+import { createRequire } from "module";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 const openai = new OpenAI({
-    apiKey: "PUT API KEY HERE",
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function main() {
+async function main(userInput) {
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Can you write a 50 word essay on why Linux is better than Windows and Mac?" }],
+    messages: [{ role: "system", content: userInput }],
     model: "gpt-3.5-turbo",
   });
 
   console.log(completion.choices[0]);
 }
 
-main();
+const require = createRequire(import.meta.url);
+
+const prompt = require('prompt-sync')({sigint: true});
+const userInput = prompt('Enter your message: ');
+
+main(userInput);
+
