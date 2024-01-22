@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
@@ -132,6 +133,7 @@ export default function Home() {
             className="absolute right-2 top-1 h-3 w-3 rounded-full bg-red-500 text-white"
           ></button>
         </div>
+        <AudioCaptureButton />
       </main>
     </>
   );
