@@ -10,12 +10,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/dom-speech-recognition": "^0.0.4",
+    "@uiw/react-md-editor": "^4.0.3",
     "dotenv": "^16.3.1",
     "next": "14.0.1",
+    "next-seo": "^6.4.0",
     "openai": "^4.0.0",
     "prompt-sync": "^4.2.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-textarea-autosize": "^8.5.3",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
