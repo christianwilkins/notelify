@@ -100,7 +100,7 @@ export default function Home() {
   return (
     <>
       <SideBar></SideBar>
-      <main className="flex flex-col items-center justify-between p-24 bg-white">
+      <main className="flex flex-col items-center justify-between p-24 bg-white dark:bg-[#171717]">
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
