@@ -77,29 +77,47 @@
       setIsEditing(false);
     };
 
+    const handleTextareaChange = (e) => {
+      setMarkdown(e.target.value);
+    };
+  
+    const handleTextareaKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        // Allow the default action to happen which is inserting a new line
+      }
+    };
+  
+  
+
     return (
-      <div className="markdown-editor" onClick={switchToEdit}>
-        {isEditing ? (
-          <div
-            ref={editorRef}
-            contentEditable
-            onInput={handleContentEditableInput}
-            onBlur={switchToPreview}
-            suppressContentEditableWarning={true}
-            style={{
-              minHeight: '200px',
-              padding: '10px',
-              border: '1px solid #ccc',
-              lineHeight: '1.5',
-              outline: 'none',
-            }}
-          >
-            {markdown}
-          </div>
-        ) : (
-          <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} />
-        )}
-      </div>
+      <div className="markdown-editor" onClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
+      {isEditing ? (
+        <div
+          ref={editorRef}
+          contentEditable
+          onInput={handleContentEditableInput}
+          onKeyDown={handleTextareaKeyDown}
+          onBlur={switchToPreview}
+          suppressContentEditableWarning={true}
+          style={{
+            width: '100%', // Use 100% of the container's width
+            minHeight: '200px', // Minimum height to start with
+            maxHeight: '600px', // Maximum height before scrolling
+            padding: '10px',
+            border: '1px solid #ccc',
+            lineHeight: '1.5',
+            outline: 'none',
+            overflowY: 'auto', // Enable vertical scroll
+            resize: 'vertical', // Allow only vertical resizing
+            boxSizing: 'border-box', // Include padding and border in the element's width and height
+          }}
+        >
+          {markdown}
+        </div>
+      ) : (
+        <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} />
+      )}
+    </div>
     );
   };
 
