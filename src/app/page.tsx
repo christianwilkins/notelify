@@ -12,7 +12,7 @@
 
   const bmcId = process.env.BMC_ID as string;
   const openai = new OpenAI({
-    apiKey: "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",
+    apiKey: "",
     dangerouslyAllowBrowser: true, // lmao
   });
   //if (bmcId == "") throw new Error("Buy me a coffee key not found");
