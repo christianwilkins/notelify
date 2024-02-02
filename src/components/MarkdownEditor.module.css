@@ -1,21 +1,35 @@
 /* components/MarkdownEditor.module.css */
 
 .markdownPreview h1 {
-    font-size: 2em;
-    margin-bottom: 0.5em;
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.markdownPreview h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.markdownPreview h3 {
+  font-size: 1.17em;
+  margin-bottom: 0.5em;
+}
+
+.markdownPreview li {
+  margin-bottom: 0.25em;
+}
+
+.markdownPreview ul,
+.markdownPreview ol {
+    list-style-position: inside;
+    padding-left: 20px; /* Adjust as needed */
   }
   
-  .markdownPreview h2 {
-    font-size: 1.5em;
-    margin-bottom: 0.5em;
+.markdownPreview ul {
+    list-style-type: disc; /* For unordered lists */
   }
   
-  .markdownPreview h3 {
-    font-size: 1.17em;
-    margin-bottom: 0.5em;
-  }
-  
-  .markdownPreview li {
-    margin-bottom: 0.25em;
+  .markdownPreview ol {
+    list-style-type: decimal; /* For ordered lists */
   }
   
