@@ -79,24 +79,24 @@
 
     const handleTextareaChange = (e) => {
       setMarkdown(e.target.value);
-    };
+    };    
   
-    const handleTextareaKeyDown = (e) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Enter') {
-        // Allow the default action to happen which is inserting a new line
+        document.execCommand('insertHTML', false, '\n'); // insert a newline character
+        e.preventDefault(); // prevent the default behavior
       }
     };
-  
-  
 
     return (
       <div className="markdown-editor" onClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
       {isEditing ? (
-        <div
+        <textarea
           ref={editorRef}
           contentEditable
           onInput={handleContentEditableInput}
-          onKeyDown={handleTextareaKeyDown}
+          onChange={handleTextareaChange}
+          onKeyDown={handleKeyDown}
           onBlur={switchToPreview}
           suppressContentEditableWarning={true}
           style={{
@@ -113,7 +113,7 @@
           }}
         >
           {markdown}
-        </div>
+        </textarea>
       ) : (
         <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} />
       )}
