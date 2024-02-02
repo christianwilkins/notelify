@@ -23,13 +23,18 @@
 .markdownPreview ol {
     list-style-position: inside;
     padding-left: 20px; /* Adjust as needed */
-  }
+}
   
 .markdownPreview ul {
     list-style-type: disc; /* For unordered lists */
-  }
+}
   
-  .markdownPreview ol {
+.markdownPreview ol {
     list-style-type: decimal; /* For ordered lists */
-  }
+}
+  
+.markdownPreview a {
+    color: blue; /* Sets the text color of links to blue */
+    text-decoration: underline; /* Underlines links for better visibility */
+}
   

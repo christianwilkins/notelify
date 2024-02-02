@@ -90,7 +90,7 @@
     };
 
     return (
-      <div className="styles.markdownEditor" onClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
+      <div className="styles.markdownEditor" onDoubleClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
       {isEditing ? (
         <textarea
           ref={editorRef}
