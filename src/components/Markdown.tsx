@@ -1,6 +1,7 @@
   import React, { useState, useEffect, useRef } from 'react';
   import ReactMarkdown from 'react-markdown';
   import remarkGfm from 'remark-gfm';
+  import styles from './MarkdownEditor.module.css';
 
   const MarkdownEditor = () => {
     const [markdown, setMarkdown] = useState('');
@@ -89,11 +90,10 @@
     };
 
     return (
-      <div className="markdown-editor" onClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
+      <div className="styles.markdownEditor" onClick={switchToEdit} style={{ width: '100%', maxWidth: '800px', margin: 'auto' }}>
       {isEditing ? (
         <textarea
           ref={editorRef}
-          contentEditable
           onInput={handleContentEditableInput}
           onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
@@ -115,7 +115,9 @@
           {markdown}
         </textarea>
       ) : (
-        <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} />
+        <div className={styles.markdownPreview}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} children={markdown} />
+        </div>
       )}
     </div>
     );
