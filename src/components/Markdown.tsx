@@ -7,17 +7,17 @@
     const [markdown, setMarkdown] = useState('');
     const [isEditing, setIsEditing] = useState(true);
     const editorRef = useRef(null);
-    const selectionRef = useRef(null);
-
+    const selectionRef = React.useRef<number | null>(null);
+    
     useEffect(() => {
       if (isEditing && editorRef.current && selectionRef.current !== null) {
         const sel = window.getSelection();
         const range = document.createRange();
         const textNodes = getTextNodes(editorRef.current);
     
-        let position = selectionRef.current;
+        let position: number | null = null; // Provide a valid initial value for position
         for (const node of textNodes) {
-            if (node.nodeType === Node.TEXT_NODE && node.textContent && position <= node.textContent.length) {
+            if (node.nodeType === Node.TEXT_NODE && node.textContent && position !== null && position <= node.textContent.length) {
             range.setStart(node, position);
             range.collapse(true);
             if (sel) {
@@ -59,7 +59,7 @@
       return textNodes;
     }
     
-    const handleContentEditableInput = (e) => {
+    const handleContentEditableInput = (e: { target: { innerText: React.SetStateAction<string>; }; }) => {
       // Save the current cursor position before updating the state
       const anchorOffset = window.getSelection()?.anchorOffset;
       if (anchorOffset !== undefined) {
@@ -78,11 +78,11 @@
       setIsEditing(false);
     };
 
-    const handleTextareaChange = (e) => {
+    const handleTextareaChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
       setMarkdown(e.target.value);
     };    
   
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: { key: string; preventDefault: () => void; }) => {
       if (e.key === 'Enter') {
         document.execCommand('insertHTML', false, '\n'); // insert a newline character
         e.preventDefault(); // prevent the default behavior
@@ -94,7 +94,6 @@
       {isEditing ? (
         <textarea
           ref={editorRef}
-          onInput={handleContentEditableInput}
           onChange={handleTextareaChange}
           onKeyDown={handleKeyDown}
           onBlur={switchToPreview}
@@ -110,6 +109,8 @@
             overflowY: 'auto', // Enable vertical scroll
             resize: 'vertical', // Allow only vertical resizing
             boxSizing: 'border-box', // Include padding and border in the element's width and height
+            backgroundColor: isEditing ? 'black' : '', // Set background color to black when editing
+            color: isEditing ? 'white' : '', // Ensure text color is white when editing  
           }}
         >
           {markdown}
