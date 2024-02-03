@@ -14,8 +14,8 @@ dotenv.config();
 const bmcId = process.env.BMC_ID as string;
 const openaiKey = process.env.REACT_APP_OPENAI_API_KEY;
 const openai = new OpenAI({
-  /* apiKey: openaiKey, */
-  apiKey: "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",
+  apiKey: openaiKey,
+  /* apiKey: "", */
   dangerouslyAllowBrowser: true, // lmao
 });
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
