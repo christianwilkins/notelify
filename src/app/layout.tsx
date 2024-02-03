@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   description: "Notelify Title",
 };
 
+
 export default function RootLayout({
   children,
 }: {
