@@ -3,16 +3,85 @@ import Image from "next/image";
 import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
+import { Request, Response, response } from "express";
+import { OpenAI } from "openai";
+import * as dotenv from "dotenv";
+import * as marked from "marked";
+
+dotenv.config();
 
 const bmcId = process.env.BMC_ID as string;
+const openaiKey = process.env.REACT_APP_OPENAI_API_KEY;
+const openai = new OpenAI({
+  apiKey: openaiKey,
+  /* apiKey: "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", */
+  dangerouslyAllowBrowser: true, // lmao
+});
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
 
 export default function Home() {
+  const [generatedResponses, setGeneratedResponses] = useState("");
   const [finalTranscript, setFinalTranscript] = useState("");
   const [transcriptBoxValue, setTranscriptBoxValue] = useState("");
   const transcriptRef = useRef<HTMLDivElement>(null);
   //let recognition: any;
   const recognition = useRef<any>(null);
+  const [wordCount, setWordCount] = useState<number>(0);
+  const [wordsSinceLastApiCall, setWordsSinceLastApiCall] = useState(0);
+
+  // OpenAIApi initialization
+
+  //These arrays are to maintain the history of the conversation
+  const conversationContext: any[][] = [];
+  const currentMessages: { role: string; content: any }[] = [];
+
+  // open ai changes the api so much lol
+  // https://github.com/openai/openai-node/discussions/217
+  const generateResponseWithDelay = async (
+    chunks: string[]
+  ): Promise<string> => {
+    try {
+      const transcribedText = chunks.join(" ");
+      // The prompt should clearly indicate where the transcribed text starts.
+      const prompt = `
+  Transcribed Text:
+  ${transcribedText}
+  
+  Convert the above transcribed text into key points and main ideas using Markdown, which splits words and text into headers/headings, bullet points, bolding, italics, underlines, etc. (and any combination thereof)? Ensure YOU DO NOT deviate from this style format for every message given to you. Sometimes, the message will not be long enough, and you may need to wait a bit before processing the file. DO NOT just convert text to markdown. Highlight what is important information to take out from the provided conversation using a traditional style guide. Create it as if you were writing detailed notes with important examples. Do not miss out on information. Ensure the generated text includes relevant details about the topic discussed. Please additionally add a summary at the end or a conclusion. Adapt the response to the context of the conversation, including concepts, examples, and any recommended style guide. Output generated markdown as a code block. Do not allow the generated text to fall outside the code block    
+  `;
+      const modelId = "gpt-3.5-turbo-instruct"; // Or the latest model ID
+      // Update this with the correct model id for version 4.0.0
+
+      // Restore the previous context
+      for (const [inputText, responseText] of conversationContext) {
+        currentMessages.push({ role: "user", content: inputText });
+        currentMessages.push({ role: "assistant", content: responseText });
+      }
+
+      // Stores the new message
+      currentMessages.push({ role: "user", content: prompt });
+
+      const result = await openai.completions.create({
+        model: modelId,
+        prompt: prompt,
+        max_tokens: 2000,
+      });
+
+      const responseText = result.choices[0].text;
+      conversationContext.push([prompt, responseText]);
+
+      return responseText;
+    } catch (err) {
+      console.error(err);
+    }
+    return "";
+  };
+
+  const generateResponse = async (chunks: string[]): Promise<string> => {
+    const response = await generateResponseWithDelay(chunks);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Add a 1-second delay between requests
+    return response;
+  };
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -30,27 +99,57 @@ export default function Home() {
         "Your browser does not support the Web Speech API. Please try another browser."
       );
     } else {
-      //recognition = new webkitSpeechRecognition();
+      recognition.current = new webkitSpeechRecognition();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
 
-      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.current.onresult = async (event: {
+        resultIndex: any;
+        results: string | any[];
+      }) => {
         let interimTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           let currentResult = event.results[i];
           if (currentResult.isFinal) {
-            setTranscriptBoxValue(
-              (prevValue) => prevValue + " " + currentResult[0].transcript
-            );
+            const transcript = currentResult[0].transcript;
+            setTranscriptBoxValue((prevValue) => prevValue + transcript);
+
+            const newWords = transcript.split(" ").length;
+            setWordCount((prevWordCount) => prevWordCount + newWords);
+            setWordsSinceLastApiCall((prevCount) => prevCount + newWords);
+
+            // Check if the accumulated words since the last API call are more than or equal to 250
+            if (wordsSinceLastApiCall + newWords >= 25) {
+              console.log("More than 250 words have been recognized.");
+
+              // Assuming finalTranscript is up to date with the latest state
+              let words = (finalTranscript + transcript).split(" ");
+              let chunks = [];
+              for (let i = 0; i < words.length; i += 250) {
+                chunks.push(words.slice(i, i + 250).join(" "));
+              }
+              console.log("Chunks: ", chunks);
+
+              // Reset word count
+              setWordCount(0);
+              setWordsSinceLastApiCall(0);
+
+              // Send the chunks to the API and handle the response
+              const response = await generateResponse(chunks);
+              setGeneratedResponses(response);
+            } else {
+              // Otherwise, just update the word count
+              // setWordCount(newWordCount);
+            }
           }
           interimTranscript += currentResult[0].transcript;
         }
+
         if (transcriptRef.current) {
           transcriptRef.current.innerText =
             finalTranscript + " " + interimTranscript;
         }
       };
-
       recognition.current.start();
     }
   };
@@ -104,17 +203,35 @@ export default function Home() {
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
-          <h1 style={{ fontSize: "60px", fontWeight: "450" }}>
+          <h1 style={{ fontSize: "50px", fontWeight: "450" }}>
             GPT Finds Title
           </h1>
         </div>
-        <MDEditor
-          value={transcriptBoxValue}
-          onChange={(value) => value && setTranscriptBoxValue(value)}
-          preview="edit"
-          height={400}
-          visiableDragbar={false}
-        />
+        {/* <div
+          dangerouslySetInnerHTML={{
+            __html: marked.parse(transcriptBoxValue),
+          }}
+        /> */}
+        <div className="flex items-center">
+          <div className="w-1/2 p-4">
+            <MDEditor
+              value={transcriptBoxValue}
+              onChange={(value) => value && setTranscriptBoxValue(value)}
+              preview="edit"
+              height={400}
+              visiableDragbar={false}
+            />
+          </div>
+          <div className="w-1/2 p-4">
+            <MDEditor
+              value={generatedResponses}
+              onChange={(value) => value && setGeneratedResponses(value)}
+              preview="edit"
+              height={400}
+              visiableDragbar={false}
+            />
+          </div>
+        </div>
 
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 

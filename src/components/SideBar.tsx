@@ -78,7 +78,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -102,7 +102,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -120,7 +120,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -137,7 +137,7 @@ export default function SideBar() {
                   <path
                     d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                     stroke-linecap="round"
                   ></path>
                 </svg>
@@ -165,7 +165,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -179,7 +179,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -233,7 +233,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -247,7 +247,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -304,7 +304,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -329,7 +329,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -346,7 +346,7 @@ export default function SideBar() {
                   <path
                     d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                     stroke-linecap="round"
                   ></path>
                 </svg>
@@ -398,7 +398,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -415,7 +415,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -432,7 +432,7 @@ export default function SideBar() {
                   <path
                     d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                     stroke-linecap="round"
                   ></path>
                 </svg>
@@ -484,7 +484,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -515,7 +515,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
