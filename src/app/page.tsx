@@ -5,6 +5,7 @@ import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
 import MarkdownEditor from "@/components/Markdown";
+import { Editor } from "novel";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
@@ -16,6 +17,7 @@ export default function Home() {
   //let recognition: any;
   const recognition = useRef<any>(null);
 
+
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       recognition.current = new webkitSpeechRecognition();
@@ -24,7 +26,22 @@ export default function Home() {
         "Your browser does not support the Web Speech API. Please try another browser."
       );
     }
+  
   }, []);
+
+  // need to manually add dark theme class to html element for NOVEL editor to work
+  useEffect(() => {
+    const matchDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const applyTheme = (matches: boolean) => {
+      if (matches) {
+        document.documentElement.classList.add('dark-theme');
+      } else {
+        document.documentElement.classList.remove('dark-theme');
+      }
+    };
+    applyTheme(matchDark.matches);
+    matchDark.addEventListener('change', (e: MediaQueryListEvent) => applyTheme(e.matches));
+    }, []);
 
   const startTranscription = () => {
     if (!("webkitSpeechRecognition" in window)) {
@@ -110,7 +127,13 @@ export default function Home() {
             GPT Finds Title
           </h1>
         </div>
-        <MarkdownEditor />
+        <Editor
+          className="relative min-h-[500px] w-full max-w-screen-lg bg-white dark:bg-[#171717] border-stone-200 sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg"
+          defaultValue=""
+          completionApi={undefined}
+        />
+
+
         
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 
