@@ -123,7 +123,7 @@ export default function Home() {
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
-          <h1 style={{ fontSize: "60px", fontWeight: "450" }}>
+          <h1 style={{ fontSize: "60px", fontWeight: "450", marginBottom: "20px" }}>
             GPT Finds Title
           </h1>
         </div>
