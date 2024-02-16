@@ -5,7 +5,7 @@ import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
 import MarkdownEditor from "@/components/Markdown";
-import { Editor } from "novel";
+import Toolbar from "@/components/toolbar";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
@@ -127,11 +127,9 @@ export default function Home() {
             GPT Finds Title
           </h1>
         </div>
-        <Editor
-          className="relative min-h-[500px] w-full max-w-screen-lg bg-white dark:bg-[#171717] border-stone-200 sm:mb-[calc(20vh)] sm:rounded-lg sm:border sm:shadow-lg"
-          defaultValue=""
-          completionApi={undefined}
-        />
+        <div>
+        <Toolbar></Toolbar>
+        </div>
 
 
         
