@@ -4,7 +4,6 @@ import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import MarkdownEditor from "@/components/Markdown";
 import Toolbar from "@/components/toolbar";
 
 const bmcId = process.env.BMC_ID as string;

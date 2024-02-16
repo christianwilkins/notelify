@@ -13,11 +13,13 @@ body {
     )
     rgb(var(--background-start-rgb));
   @apply dark:bg-[#171717] dark:text-white;
+  @apply font-sans;
 }
 
 /* components/MarkdownEditor.module.css */
 
 .markdownPreview h1 {
+  content: attr(data-placeholder);
   font-size: 2em;
   margin-bottom: 0.5em;
 }
@@ -120,23 +122,45 @@ border-radius: 4px; /* Optional: rounded corners for code blocks */
 overflow-x: auto; /* For horizontal scrolling if code overflows */
 }
 
-/* Light mode styles */
-.markdownEditor {
-  background-color: white; /* Default background */
-  color: #171717; /* Default text color */
-}
 
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
-  .markdownEditor {
-    background-color: #171717; /* Dark mode background */
-    color: white; /* Dark mode text color */
-  }
-
   .markdownPreview {
     background-color: #171717; /* Darker shade for preview mode */
     color: #ddd; /* Lighter text for readability */
+    caret-color: white
   }
+  .is-empty::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;    
+  }
+}
 
-  /* Add other dark mode specific styles here */
+@media screen and (max-width: 768px) {
+  .markdownPreview .ProseMirror {
+    padding: 10px;
+  }
+}
+
+.markdownPreview .is-editor-empty:first-child::before {
+  color: #adb5bd; 
+  content: "Untitled"; 
+  height: 0;
+  pointer-events: none;
+  font-size: 25px; 
+  line-height: 1.5; 
+}
+
+.markdownPreview .ProseMirror {
+  min-height: 5em; 
+  overflow: auto; 
+  min-width: 10em; 
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px; 
+  box-sizing: border-box; 
 }
