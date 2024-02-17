@@ -61,7 +61,7 @@ const TiptapEditor = () => {
     <div style={{
       minHeight: '1000px',
       maxWidth: '800px', 
-      minWidth: '500px', 
+      minWidth: '1500px', 
       width: '80%', 
       margin: 'auto', 
       overflow: 'auto',
