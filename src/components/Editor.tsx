@@ -5,6 +5,7 @@ import Typography from '@tiptap/extension-typography';
 import Placeholder from '@tiptap/extension-placeholder';
 import { markPasteRule } from '@tiptap/core'
 import { Markdown } from "tiptap-markdown";
+import TiptapUnderline from "@tiptap/extension-underline";
 
 const TiptapEditor = () => {
   const editor = useEditor({
@@ -31,14 +32,16 @@ const TiptapEditor = () => {
       Markdown.configure({
         html: false,
         transformCopiedText: true,
-        transformPastedText: true,
+        transformPastedText: true
       }),
+      TiptapUnderline
     ],
     enablePasteRules: true,
     onUpdate: ({ editor }) => {
       const transaction = editor.state.tr.setMeta('forceUpdatePlaceholder', true);
       editor.view.dispatch(transaction);
     },
+    
   });
 
   if (!editor) {

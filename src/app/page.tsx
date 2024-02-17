@@ -4,7 +4,7 @@ import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import Toolbar from "@/components/toolbar";
+import Toolbar from "@/components/Editor";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
