@@ -115,13 +115,20 @@ body {
 
 /* Ensure code blocks are visually distinct */
 
+/* Light mode styles */
+@media (prefers-color-scheme: light) {
+  .markdownPreview pre {
+    background-color: #d3d3d3dc; /* Set the text color for code blocks in light mode */
+  }
+}
+
 
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   .markdownPreview pre {
     padding: 1em;
     margin: 1em 0;
-    background-color: #f5f5f545; /* Light gray background */
+    background-color: #202020; /* Dark gray background */
     border-radius: 4px; /* Optional: rounded corners for code blocks */
     overflow-x: auto; /* For horizontal scrolling if code overflows */
   }  

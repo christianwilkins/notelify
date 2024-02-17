@@ -53,21 +53,6 @@ export default function Home() {
   
   }, []);
 
-
-  // need to manually add dark theme class to html element for NOVEL editor to work
-  useEffect(() => {
-    const matchDark = window.matchMedia('(prefers-color-scheme: dark)');
-    const applyTheme = (matches: boolean) => {
-      if (matches) {
-        document.documentElement.classList.add('dark-theme');
-      } else {
-        document.documentElement.classList.remove('dark-theme');
-      }
-    };
-    applyTheme(matchDark.matches);
-    matchDark.addEventListener('change', (e: MediaQueryListEvent) => applyTheme(e.matches));
-    }, []);
-
   const startTranscription = () => {
     if (!("webkitSpeechRecognition" in window)) {
       alert(
