@@ -131,7 +131,7 @@ overflow-x: auto; /* For horizontal scrolling if code overflows */
     caret-color: white
   }
   .is-empty::before {
-    color: #adb5bd;
+    color: #ddd;
     content: attr(data-placeholder);
     float: left;
     height: 0;
@@ -139,20 +139,15 @@ overflow-x: auto; /* For horizontal scrolling if code overflows */
   }
 }
 
-@media screen and (max-width: 768px) {
-  .markdownPreview .ProseMirror {
-    padding: 10px;
-  }
-}
 
 .markdownPreview .is-editor-empty:first-child::before {
-  color: #adb5bd; 
-  content: "Untitled"; 
+  color: #ddd; 
+  content: "Untitled document";
+  float: left;
   height: 0;
-  pointer-events: none;
-  font-size: 25px; 
-  line-height: 1.5; 
+  pointer-events: none;    
 }
+
 
 .markdownPreview .ProseMirror {
   min-height: 5em; 

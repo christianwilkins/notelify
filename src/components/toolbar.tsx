@@ -4,6 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
 import Placeholder from '@tiptap/extension-placeholder';
 import { markPasteRule } from '@tiptap/core'
+import { Markdown } from "tiptap-markdown";
 
 const TiptapEditor = () => {
   const editor = useEditor({
@@ -11,7 +12,10 @@ const TiptapEditor = () => {
       StarterKit,
       Typography,
       Placeholder.configure({
-        placeholder: ({ node}) => {
+        placeholder: ({ node, editor}) => {
+          if (editor.isEmpty) {
+            return "Untitled";
+          }
           const headingPlaceholders: { [key: number]: string } = {
             1: "Heading 1",
             2: "Heading 2",
@@ -19,12 +23,18 @@ const TiptapEditor = () => {
           };
 
           if (node.type.name === "heading") {
-            return headingPlaceholders[node.attrs.level];
+            return headingPlaceholders[node.attrs.level] || '';
           }
           return "";
         },
       }),
+      Markdown.configure({
+        html: false,
+        transformCopiedText: true,
+        transformPastedText: true,
+      }),
     ],
+    enablePasteRules: true,
     onUpdate: ({ editor }) => {
       const transaction = editor.state.tr.setMeta('forceUpdatePlaceholder', true);
       editor.view.dispatch(transaction);
