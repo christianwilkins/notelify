@@ -6,8 +6,10 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { markPasteRule } from '@tiptap/core'
 import { Markdown } from "tiptap-markdown";
 import TiptapUnderline from "@tiptap/extension-underline";
+import { useEditorContext } from './EditorContent';
 
 const TiptapEditor = () => {
+  const { setEditor } = useEditorContext();
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -43,6 +45,13 @@ const TiptapEditor = () => {
     },
     
   });
+
+  useEffect(() => {
+    setEditor(editor);
+    return () => {
+      setEditor(null);
+    };
+  }, [editor, setEditor]);
 
   if (!editor) {
     return null;

@@ -4,10 +4,36 @@ import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
 import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import Toolbar from "@/components/Editor";
+import Editor from "@/components/Editor";
+import { EditorProvider, useEditorContext } from "@/components/EditorContent";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
+
+const EditorConsumerComponent = () => {
+  const { setContent } = useEditorContext();
+
+  useEffect(() => {
+    const content = 
+`## Testing headers
+
+## Span Elements
+
+### Links
+
+Markdown supports two style of links: *inline* and *reference*.
+
+In both styles, the link text is delimited by [square brackets].
+
+To create an inline link, use a set of regular parentheses immediately
+    `;
+    setContent(content);
+  }, [setContent]);
+
+  return <Editor />;
+};
+
+
 
 export default function Home() {
   const [finalTranscript, setFinalTranscript] = useState("");
@@ -15,7 +41,6 @@ export default function Home() {
   const transcriptRef = useRef<HTMLDivElement>(null);
   //let recognition: any;
   const recognition = useRef<any>(null);
-
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -27,6 +52,7 @@ export default function Home() {
     }
   
   }, []);
+
 
   // need to manually add dark theme class to html element for NOVEL editor to work
   useEffect(() => {
@@ -127,7 +153,9 @@ export default function Home() {
           </h1>
         </div>
         <div>
-        <Toolbar></Toolbar>
+        <EditorProvider>
+          <EditorConsumerComponent />
+        </EditorProvider>
         </div>
 
 
