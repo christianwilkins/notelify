@@ -35,7 +35,6 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
       }),
       TiptapUnderline,
     ],
-    content: 'Some text i guess',
     enablePasteRules: true,
     onUpdate: ({ editor }) => {
       const transaction = editor.state.tr.setMeta('forceUpdatePlaceholder', true);
@@ -50,7 +49,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
     return () => {
       editor?.destroy();
     };
-  }, [editor, onEditorReady]);
+  }, [onEditorReady]);
 
   if (!editor) {
     return null;
