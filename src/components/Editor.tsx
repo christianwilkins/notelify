@@ -47,7 +47,6 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
       onEditorReady?.(editor);
     }
     return () => {
-      editor?.destroy();
     };
   }, [onEditorReady]);
 
