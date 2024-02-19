@@ -8,13 +8,39 @@ import { Request, Response, response } from "express";
 import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
 import * as marked from "marked";
+import MarkdownEditor from "@/components/Markdown";
+import Editor from "@/components/Editor";
+import { EditorProvider, useEditorContext } from "@/components/EditorContent";
 
 dotenv.config();
 
 const bmcId = process.env.BMC_ID as string;
-const openaiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
+const EditorConsumerComponent = () => {
+  const { setContent } = useEditorContext();
+
+  useEffect(() => {
+    const content = `## Testing headers
+
+## Span Elements
+
+### Links
+
+Markdown supports two style of links: *inline* and *reference*.
+
+In both styles, the link text is delimited by [square brackets].
+
+To create an inline link, use a set of regular parentheses immediately
+    `;
+    setContent(content);
+  }, [setContent]);
+
+  return <Editor />;
+};
+
+const openaiKey = process.env.OPENAI_API_KEY;
 const openai = new OpenAI({
-  apiKey: openaiKey,
+  apiKey: openaiKey as string,
   /* apiKey: "", */
   dangerouslyAllowBrowser: true, // lmao
 });
@@ -25,16 +51,13 @@ export default function Home() {
   const [finalTranscript, setFinalTranscript] = useState("");
   const [transcriptBoxValue, setTranscriptBoxValue] = useState("");
   const transcriptRef = useRef<HTMLDivElement>(null);
-  //let recognition: any;
   const recognition = useRef<any>(null);
-  const [wordCount, setWordCount] = useState<number>(0);
-  const [wordsSinceLastApiCall, setWordsSinceLastApiCall] = useState(0);
 
-  // OpenAIApi initialization
-
-  //These arrays are to maintain the history of the conversation
   const conversationContext: any[][] = [];
   const currentMessages: { role: string; content: any }[] = [];
+  const transcriptWordCount: string[] = [];
+  const increment: number = 100;
+  let apiThreshold: number = increment;
 
   // open ai changes the api so much lol
   // https://github.com/openai/openai-node/discussions/217
@@ -65,7 +88,7 @@ export default function Home() {
       const result = await openai.completions.create({
         model: modelId,
         prompt: prompt,
-        max_tokens: 2000,
+        max_tokens: 500,
       });
 
       const responseText = result.choices[0].text;
@@ -111,33 +134,29 @@ export default function Home() {
         let interimTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           let currentResult = event.results[i];
+          // console.log("Current result: ", currentResult);
           if (currentResult.isFinal) {
-            const transcript = currentResult[0].transcript;
+            console.log(
+              "transcript from result: ",
+              currentResult[0].transcript
+            );
+            const transcript: string = currentResult[0].transcript;
             setTranscriptBoxValue((prevValue) => prevValue + transcript);
 
-            const newWords = transcript.split(" ").length;
-            setWordCount((prevWordCount) => prevWordCount + newWords);
-            setWordsSinceLastApiCall((prevCount) => prevCount + newWords);
+            transcriptWordCount.push(...transcript.split(" "));
+            console.log("Transcript word count object: ", transcriptWordCount);
 
             // Check if the accumulated words since the last API call are more than or equal to 250
-            if (wordsSinceLastApiCall + newWords >= 25) {
-              console.log("More than 250 words have been recognized.");
-
-              // Assuming finalTranscript is up to date with the latest state
-              let words = (finalTranscript + transcript).split(" ");
-              let chunks = [];
-              for (let i = 0; i < words.length; i += 250) {
-                chunks.push(words.slice(i, i + 250).join(" "));
-              }
-              console.log("Chunks: ", chunks);
-
-              // Reset word count
-              setWordCount(0);
-              setWordsSinceLastApiCall(0);
+            if (transcriptWordCount.length >= apiThreshold) {
+              console.log(
+                apiThreshold,
+                " words have been recognized. Calling the API with the full transcript."
+              );
+              apiThreshold += increment;
 
               // Send the chunks to the API and handle the response
-              const response = await generateResponse(chunks);
-              setGeneratedResponses(response);
+              const response = await generateResponse(transcriptWordCount);
+              setGeneratedResponses((prevResponse) => prevResponse + response);
             } else {
               // Otherwise, just update the word count
               // setWordCount(newWordCount);
@@ -208,11 +227,25 @@ export default function Home() {
             GPT Finds Title
           </h1>
         </div>
+        <div>
+          <EditorProvider>
+            <EditorConsumerComponent />
+          </EditorProvider>
+        </div>
         {/* <div
           dangerouslySetInnerHTML={{
             __html: marked.parse(transcriptBoxValue),
           }}
-        /> */}
+        /> 
+        <MarkdownEditor
+          value={transcriptBoxValue}
+          onChange={(value) => value && setTranscriptBoxValue(value)}
+        />
+        <MarkdownEditor
+          value={generatedResponses}
+          onChange={(value) => value && setGeneratedResponses(value)}
+        />
+
         <div className="flex items-center">
           <div className="w-1/2 p-4">
             <MDEditor
@@ -232,7 +265,7 @@ export default function Home() {
               visiableDragbar={false}
             />
           </div>
-        </div>
+        </div> */}
 
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 

@@ -10,6 +10,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tiptap/extension-placeholder": "^2.2.3",
+    "@tiptap/extension-typography": "^2.2.3",
+    "@tiptap/extension-underline": "^2.2.3",
+    "@tiptap/pm": "^2.2.3",
+    "@tiptap/react": "^2.2.3",
+    "@tiptap/starter-kit": "^2.2.3",
     "@types/dom-speech-recognition": "^0.0.4",
     "@uiw/react-md-editor": "^4.0.3",
     "dotenv": "^16.3.1",
@@ -22,6 +28,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-textarea-autosize": "^8.5.3",
+    "tiptap": "^1.32.2",
+    "tiptap-markdown": "^0.8.9",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
