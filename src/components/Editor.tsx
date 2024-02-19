@@ -1,21 +1,22 @@
 import React, { useEffect } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
 import Placeholder from '@tiptap/extension-placeholder';
-import { markPasteRule } from '@tiptap/core'
 import { Markdown } from "tiptap-markdown";
 import TiptapUnderline from "@tiptap/extension-underline";
-import { useEditorContext } from './EditorContent';
 
-const TiptapEditor = () => {
-  const { setEditor } = useEditorContext();
+interface TiptapEditorProps {
+  onEditorReady?: (editor: Editor) => void; // Callback prop to pass the editor instance to the parent
+}
+
+const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Typography,
       Placeholder.configure({
-        placeholder: ({ node, editor}) => {
+        placeholder: ({ node, editor }) => {
           if (editor.isEmpty) {
             return "Untitled";
           }
@@ -24,34 +25,32 @@ const TiptapEditor = () => {
             2: "Heading 2",
             3: "Heading 3",
           };
-
-          if (node.type.name === "heading") {
-            return headingPlaceholders[node.attrs.level] || '';
-          }
-          return "";
+          return headingPlaceholders[node.attrs.level] || '';
         },
       }),
       Markdown.configure({
         html: false,
         transformCopiedText: true,
-        transformPastedText: true
+        transformPastedText: true,
       }),
-      TiptapUnderline
+      TiptapUnderline,
     ],
+    content: 'Some text i guess',
     enablePasteRules: true,
     onUpdate: ({ editor }) => {
       const transaction = editor.state.tr.setMeta('forceUpdatePlaceholder', true);
       editor.view.dispatch(transaction);
     },
-    
   });
 
   useEffect(() => {
-    setEditor(editor);
+    if (editor) {
+      onEditorReady?.(editor);
+    }
     return () => {
-      setEditor(null);
+      editor?.destroy();
     };
-  }, [editor, setEditor]);
+  }, [editor, onEditorReady]);
 
   if (!editor) {
     return null;
@@ -65,7 +64,7 @@ const TiptapEditor = () => {
       width: '80%', 
       margin: 'auto', 
       overflow: 'auto',
-      padding: '20px', 
+      padding: '20px',
     }}>    
       <EditorContent className="markdownPreview" editor={editor} />
     </div>
@@ -73,4 +72,5 @@ const TiptapEditor = () => {
 };
 
 export default TiptapEditor;
+
 

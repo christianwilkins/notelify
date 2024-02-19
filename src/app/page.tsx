@@ -2,38 +2,12 @@
 import Image from "next/image";
 import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
-import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import Editor from "@/components/Editor";
-import { EditorProvider, useEditorContext } from "@/components/EditorContent";
+import ModifiedEditor from "@/components/Editor";
+import { Editor } from '@tiptap/react';
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
-
-const EditorConsumerComponent = () => {
-  const { setContent } = useEditorContext();
-
-  useEffect(() => {
-    const content = 
-`## Testing headers
-
-## Span Elements
-
-### Links
-
-Markdown supports two style of links: *inline* and *reference*.
-
-In both styles, the link text is delimited by [square brackets].
-
-To create an inline link, use a set of regular parentheses immediately
-    `;
-    setContent(content);
-  }, [setContent]);
-
-  return <Editor />;
-};
-
-
 
 export default function Home() {
   const [finalTranscript, setFinalTranscript] = useState("");
@@ -42,6 +16,17 @@ export default function Home() {
   //let recognition: any;
   const recognition = useRef<any>(null);
 
+  const editorRef = useRef<Editor | null>(null); 
+  const handleEditorReady = (editor: Editor | null) => {
+    editorRef.current = editor;
+  };
+
+  const setEditorContent = (content: string) => {
+    if (editorRef.current) {
+      editorRef.current.commands.setContent(content);
+    }
+  };
+  
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       recognition.current = new webkitSpeechRecognition();
@@ -59,6 +44,8 @@ export default function Home() {
         "Your browser does not support the Web Speech API. Please try another browser."
       );
     } else {
+      setEditorContent("sup");
+      console.log("hi")
       //recognition = new webkitSpeechRecognition();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
@@ -71,6 +58,7 @@ export default function Home() {
             setTranscriptBoxValue(
               (prevValue) => prevValue + " " + currentResult[0].transcript
             );
+
           }
           interimTranscript += currentResult[0].transcript;
         }
@@ -138,9 +126,8 @@ export default function Home() {
           </h1>
         </div>
         <div>
-        <EditorProvider>
-          <EditorConsumerComponent />
-        </EditorProvider>
+        <ModifiedEditor onEditorReady={handleEditorReady}>
+        </ModifiedEditor>
         </div>
 
 
