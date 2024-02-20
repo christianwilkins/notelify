@@ -128,6 +128,25 @@ body {
   .markdownPreview pre {
     background-color: #d3d3d3dc; /* Set the text color for code blocks in light mode */
   }
+  .markdownPreview pre {
+    background-color: #e0e0e0; /* Light gray background for code blocks */
+    color: black;
+  }  
+  .markdownPreview code {
+    background-color: #c0c0c0; /* Lighter gray background for inline code */
+    color: black;
+  }  
+  .markdownPreview pre code {
+    background-color: inherit; /* Ensures consistency with the parent pre element */
+  }  
+
+  .is-empty::before {
+    color: #747373;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;    
+  }
 }
 
 
@@ -156,14 +175,14 @@ body {
   }
 
   .is-empty::before {
-    color: #ddd;
+    color: #7a7878;
     content: attr(data-placeholder);
     float: left;
     height: 0;
     pointer-events: none;    
   }
 }
-
+  
 
 .markdownPreview .is-editor-empty:first-child::before {
   color: #ddd; 
