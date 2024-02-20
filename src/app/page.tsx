@@ -2,49 +2,22 @@
 import Image from "next/image";
 import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
-import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import { Request, Response, response } from "express";
+import ModifiedEditor, { ModifiedEditorHandle } from "@/components/Editor";
 import { OpenAI } from "openai";
 import * as dotenv from "dotenv";
-import * as marked from "marked";
-import MarkdownEditor from "@/components/Markdown";
-import Editor from "@/components/Editor";
-import { EditorProvider, useEditorContext } from "@/components/EditorContent";
+
+const bmcId = process.env.BMC_ID as string;
+//if (bmcId == "") throw new Error("Buy me a coffee key not found");
 
 dotenv.config();
 
-const bmcId = process.env.BMC_ID as string;
-
-const EditorConsumerComponent = () => {
-  const { setContent } = useEditorContext();
-
-  useEffect(() => {
-    const content = `## Testing headers
-
-## Span Elements
-
-### Links
-
-Markdown supports two style of links: *inline* and *reference*.
-
-In both styles, the link text is delimited by [square brackets].
-
-To create an inline link, use a set of regular parentheses immediately
-    `;
-    setContent(content);
-  }, [setContent]);
-
-  return <Editor />;
-};
-
-const openaiKey = process.env.OPENAI_API_KEY;
+const openaiKey = process.env.OPENAI_API_KEY as string;
 const openai = new OpenAI({
-  apiKey: openaiKey as string,
+  apiKey: openaiKey,
   /* apiKey: "", */
   dangerouslyAllowBrowser: true, // lmao
 });
-//if (bmcId == "") throw new Error("Buy me a coffee key not found");
 
 export default function Home() {
   const [generatedResponses, setGeneratedResponses] = useState("");
@@ -56,11 +29,30 @@ export default function Home() {
   const conversationContext: any[][] = [];
   const currentMessages: { role: string; content: any }[] = [];
   const transcriptWordCount: string[] = [];
-  const increment: number = 100;
+  const increment: number = 50;
   let apiThreshold: number = increment;
 
-  // open ai changes the api so much lol
-  // https://github.com/openai/openai-node/discussions/217
+  const editorRef = useRef<ModifiedEditorHandle>(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      setIsEditorReady(true);
+    }
+  }, [editorRef]);
+
+  const setEditorContent = (content: string) => {
+    if (isEditorReady && editorRef.current) {
+      editorRef.current.setContent(content);
+    }
+  };
+
+  const appendEditorContent = (content: string) => {
+    if (isEditorReady && editorRef.current) {
+      editorRef.current.appendContent(content);
+    }
+  };
+
   const generateResponseWithDelay = async (
     chunks: string[]
   ): Promise<string> => {
@@ -106,7 +98,6 @@ export default function Home() {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Add a 1-second delay between requests
     return response;
   };
-
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       recognition.current = new webkitSpeechRecognition();
@@ -126,6 +117,7 @@ export default function Home() {
       recognition.current = new webkitSpeechRecognition();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
+      setEditorContent("### api editor content");
 
       recognition.current.onresult = async (event: {
         resultIndex: any;
@@ -136,6 +128,7 @@ export default function Home() {
           let currentResult = event.results[i];
           // console.log("Current result: ", currentResult);
           if (currentResult.isFinal) {
+            setEditorContent("updating editor content");
             console.log(
               "transcript from result: ",
               currentResult[0].transcript
@@ -148,6 +141,8 @@ export default function Home() {
 
             // Check if the accumulated words since the last API call are more than or equal to 250
             if (transcriptWordCount.length >= apiThreshold) {
+              appendEditorContent("### api editor content");
+
               console.log(
                 apiThreshold,
                 " words have been recognized. Calling the API with the full transcript."
@@ -156,12 +151,14 @@ export default function Home() {
 
               // Send the chunks to the API and handle the response
               const response = await generateResponse(transcriptWordCount);
-              setGeneratedResponses((prevResponse) => prevResponse + response);
+              console.log(response);
+              setEditorContent("# api editor content(1)" + response);
             } else {
               // Otherwise, just update the word count
               // setWordCount(newWordCount);
             }
           }
+
           interimTranscript += currentResult[0].transcript;
         }
 
@@ -223,49 +220,19 @@ export default function Home() {
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
-          <h1 style={{ fontSize: "50px", fontWeight: "450" }}>
+          <h1
+            style={{
+              fontSize: "60px",
+              fontWeight: "450",
+              marginBottom: "20px",
+            }}
+          >
             GPT Finds Title
           </h1>
         </div>
         <div>
-          <EditorProvider>
-            <EditorConsumerComponent />
-          </EditorProvider>
+          <ModifiedEditor ref={editorRef}></ModifiedEditor>
         </div>
-        {/* <div
-          dangerouslySetInnerHTML={{
-            __html: marked.parse(transcriptBoxValue),
-          }}
-        /> 
-        <MarkdownEditor
-          value={transcriptBoxValue}
-          onChange={(value) => value && setTranscriptBoxValue(value)}
-        />
-        <MarkdownEditor
-          value={generatedResponses}
-          onChange={(value) => value && setGeneratedResponses(value)}
-        />
-
-        <div className="flex items-center">
-          <div className="w-1/2 p-4">
-            <MDEditor
-              value={transcriptBoxValue}
-              onChange={(value) => value && setTranscriptBoxValue(value)}
-              preview="edit"
-              height={400}
-              visiableDragbar={false}
-            />
-          </div>
-          <div className="w-1/2 p-4">
-            <MDEditor
-              value={generatedResponses}
-              onChange={(value) => value && setGeneratedResponses(value)}
-              preview="edit"
-              height={400}
-              visiableDragbar={false}
-            />
-          </div>
-        </div> */}
 
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 
