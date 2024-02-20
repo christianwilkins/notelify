@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import React, { useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useEditor, EditorContent, Editor, Content } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Typography from '@tiptap/extension-typography';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from "tiptap-markdown";
 import TiptapUnderline from "@tiptap/extension-underline";
 
-interface TiptapEditorProps {
-  onEditorReady?: (editor: Editor) => void; // Callback prop to pass the editor instance to the parent
+export interface ModifiedEditorHandle {
+  setContent: (content: string) => void;
+  appendContent: (content: string) => void;
 }
 
-const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
+const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -42,13 +43,26 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
     },
   });
 
+  useImperativeHandle(ref, () => ({
+    setContent: (content: string) => {
+      editor?.commands.setContent(content);
+    },
+    appendContent: (content: string) => {
+      if (editor) {
+        if (!editor.isEmpty) {
+          editor.chain().focus().insertContent(content).run();
+        } else {
+          editor.commands.setContent(content);
+        }
+      }
+    },
+  }));
+
   useEffect(() => {
     if (editor) {
-      onEditorReady?.(editor);
+      editor.commands.setContent("Notes will be generated here...");
     }
-    return () => {
-    };
-  }, [onEditorReady]);
+  }, [editor]);
 
   if (!editor) {
     return null;
@@ -67,7 +81,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({ onEditorReady }) => {
       <EditorContent className="markdownPreview" editor={editor} />
     </div>
   );
-};
+});
 
 export default TiptapEditor;
 
