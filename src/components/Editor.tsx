@@ -69,15 +69,17 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
   }
 
   return (
-    <div style={{
-      minHeight: '1000px',
-      maxWidth: '800px', 
-      minWidth: '1500px', 
-      width: '80%', 
-      margin: 'auto', 
-      overflow: 'auto',
-      padding: '20px',
-    }}>    
+    <div
+      style={{
+        minHeight: "100vh", // 100% of the viewport height
+        maxWidth: "80vw", // 80% of the viewport width
+        minWidth: "75vw", // 75% of the viewport width, adjust this according to your needs
+        width: "80%", // This remains as a percentage of the parent element
+        margin: "auto",
+        overflow: "auto",
+        padding: "20px",
+      }}
+    >
       <EditorContent className="markdownPreview" editor={editor} />
     </div>
   );
