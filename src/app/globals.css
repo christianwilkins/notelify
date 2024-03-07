@@ -64,7 +64,7 @@ body {
 }
     
 .markdownPreview a {
-  color: blue; /* Sets the text color of links to blue */
+  color: rgb(135, 135, 135);
   text-decoration: underline; /* Underlines links for better visibility */
 }
 

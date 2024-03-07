@@ -644,10 +644,10 @@
   resolved "https://registry.npmjs.org/@tiptap/extension-italic/-/extension-italic-2.2.2.tgz"
   integrity sha512-l9NZK4vYqYY9Y5UskLQpdbvi0sXG4I/MuhRxPdjitK8E3SVhZxMnoNwCTkq0+I1xBjCD/jSrDMV4FqkKesrl2w==
 
-"@tiptap/extension-link@^2.1.7":
-  version "2.2.2"
-  resolved "https://registry.npmjs.org/@tiptap/extension-link/-/extension-link-2.2.2.tgz"
-  integrity sha512-hk2cxSWeFagv2erxVI4UUN9kTLqhTSLhtHKVNbKOW50dtkDqjzp9tri1+LYYpiObxDKoFFKfKjE6ojVtqMyn2w==
+"@tiptap/extension-link@^2.1.7", "@tiptap/extension-link@^2.2.4":
+  version "2.2.4"
+  resolved "https://registry.npmjs.org/@tiptap/extension-link/-/extension-link-2.2.4.tgz"
+  integrity sha512-Qsx0cFZm4dxbkToXs5TcXbSoUdicv8db1gV1DYIZdETqjBm4wFjlzCUP7hPHFlvNfeSy1BzAMRt+RpeuiwvxWQ==
   dependencies:
     linkifyjs "^4.1.0"
 

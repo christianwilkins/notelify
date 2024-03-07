@@ -12,7 +12,7 @@ const bmcId = process.env.BMC_ID as string;
 
 dotenv.config();
 
-const openaiKey = process.env.OPENAI_API_KEY;
+const openaiKey = "";
 const openai = new OpenAI({
   apiKey: openaiKey as string,
   /* apiKey: "", */

@@ -5,6 +5,8 @@ import Typography from '@tiptap/extension-typography';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from "tiptap-markdown";
 import TiptapUnderline from "@tiptap/extension-underline";
+import Link from '@tiptap/extension-link'
+
 
 export interface ModifiedEditorHandle {
   setContent: (content: string) => void;
@@ -31,10 +33,15 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
       }),
       Markdown.configure({
         html: false,
+        linkify: true,
         transformCopiedText: true,
         transformPastedText: true,
       }),
       TiptapUnderline,
+      Link.configure({
+        openOnClick: true,
+        autolink: false,
+      }),
     ],
     enablePasteRules: true,
     onUpdate: ({ editor }) => {
