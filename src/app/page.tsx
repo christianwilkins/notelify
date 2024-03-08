@@ -233,7 +233,6 @@ export default function Home() {
         <div>
           <ModifiedEditor ref={editorRef}></ModifiedEditor>
         </div>
-
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 
         <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 text-white p-2.5 rounded-full">
