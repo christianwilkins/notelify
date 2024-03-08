@@ -1,10 +1,12 @@
-import React, { useEffect, forwardRef, useImperativeHandle } from "react";
-import { useEditor, EditorContent, Editor, Content } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Typography from "@tiptap/extension-typography";
-import Placeholder from "@tiptap/extension-placeholder";
+import React, { useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useEditor, EditorContent, Editor, Content } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Typography from '@tiptap/extension-typography';
+import Placeholder from '@tiptap/extension-placeholder';
 import { Markdown } from "tiptap-markdown";
 import TiptapUnderline from "@tiptap/extension-underline";
+import Link from '@tiptap/extension-link'
+
 
 export interface ModifiedEditorHandle {
   setContent: (content: string) => void;
@@ -26,22 +28,24 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
             2: "Heading 2",
             3: "Heading 3",
           };
-          return headingPlaceholders[node.attrs.level] || "";
+          return headingPlaceholders[node.attrs.level] || '';
         },
       }),
       Markdown.configure({
         html: false,
+        linkify: true,
         transformCopiedText: true,
         transformPastedText: true,
       }),
       TiptapUnderline,
+      Link.configure({
+        openOnClick: true,
+        autolink: false,
+      }),
     ],
     enablePasteRules: true,
     onUpdate: ({ editor }) => {
-      const transaction = editor.state.tr.setMeta(
-        "forceUpdatePlaceholder",
-        true
-      );
+      const transaction = editor.state.tr.setMeta('forceUpdatePlaceholder', true);
       editor.view.dispatch(transaction);
     },
   });
@@ -89,3 +93,5 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
 });
 
 export default TiptapEditor;
+
+

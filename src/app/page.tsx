@@ -62,8 +62,7 @@ export default function Home() {
       const prompt = `
   Transcribed Text:
   ${transcribedText}
-  
-  Convert the above transcribed text into key points and main ideas using Markdown, which splits words and text into headers/headings, bullet points, bolding, italics, underlines, etc. (and any combination thereof)? Ensure YOU DO NOT deviate from this style format for every message given to you. Sometimes, the message will not be long enough, and you may need to wait a bit before processing the file. DO NOT just convert text to markdown. Highlight what is important information to take out from the provided conversation using a traditional style guide. Create it as if you were writing detailed notes with important examples. Do not miss out on information. Ensure the generated text includes relevant details about the topic discussed. Please additionally add a summary at the end or a conclusion. Adapt the response to the context of the conversation, including concepts, examples, and any recommended style guide. Output generated markdown as a code block. Do not allow the generated text to fall outside the code block    
+  Convert the above transcribed text into key points and main ideas using Markdown, which splits words and text into headers/headings, bullet points, bolding, italics, underlines, etc. (and any combination thereof)? Ensure YOU DO NOT deviate from this style format for every message given to you. Sometimes, the message will not be long enough, and you may need to wait a bit before processing the file. DO NOT just convert text to markdown. Highlight what is important information to take out from the provided conversation using a traditional style guide. Create it as if you were writing detailed notes with important examples. Do not miss out on information. Ensure the generated text includes relevant details about the topic discussed. Please additionally add a summary at the end or a conclusion. Adapt the response to the context of the conversation, including concepts, examples, and any recommended style guide. Output generated markdown as a code block. Do not allow the generated text to fall outside the code block.    
   `;
       const modelId = "gpt-3.5-turbo-instruct"; // Or the latest model ID
       // Update this with the correct model id for version 4.0.0
@@ -117,8 +116,6 @@ export default function Home() {
       recognition.current = new webkitSpeechRecognition();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
-      setEditorContent("### api editor content");
-
       recognition.current.onresult = async (event: {
         resultIndex: any;
         results: string | any[];
@@ -128,7 +125,6 @@ export default function Home() {
           let currentResult = event.results[i];
           // console.log("Current result: ", currentResult);
           if (currentResult.isFinal) {
-            setEditorContent("updating editor content");
             console.log(
               "transcript from result: ",
               currentResult[0].transcript
@@ -141,8 +137,6 @@ export default function Home() {
 
             // Check if the accumulated words since the last API call are more than or equal to 250
             if (transcriptWordCount.length >= apiThreshold) {
-              appendEditorContent("### api editor content");
-
               console.log(
                 apiThreshold,
                 " words have been recognized. Calling the API with the full transcript."
@@ -150,9 +144,13 @@ export default function Home() {
               apiThreshold += increment;
 
               // Send the chunks to the API and handle the response
-              const response = await generateResponse(transcriptWordCount);
+              let response = await generateResponse(transcriptWordCount);
+              if (response.startsWith('```')) {
+                response = response.substring(3); 
+              }
+ 
               console.log(response);
-              setEditorContent("# api editor content(1)" + response);
+              setEditorContent(response);
             } else {
               // Otherwise, just update the word count
               // setWordCount(newWordCount);

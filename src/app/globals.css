@@ -13,11 +13,13 @@ body {
     )
     rgb(var(--background-start-rgb));
   @apply dark:bg-[#171717] dark:text-white;
+  @apply font-sans;
 }
 
 /* components/MarkdownEditor.module.css */
 
 .markdownPreview h1 {
+  content: attr(data-placeholder);
   font-size: 2em;
   margin-bottom: 0.5em;
 }
@@ -33,47 +35,39 @@ body {
 }
 
 .markdownPreview li {
-    margin-bottom: 0.25em;
-  }
+  margin-bottom: 0.25em;
+}
   
 /* Adjust padding for nested paragraphs within list items */
 .markdownPreview li p {
-    margin-bottom: 0.25em;
-    padding-left: 1em; /* Adjust as needed */
+  margin-bottom: 0.25em;
+  padding-left: 1em; /* Adjust as needed */
 }
 
 /* Ensure the first paragraph has no top margin to align with the bullet/number */
 .markdownPreview li > p:first-child {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .markdownPreview ul,
 .markdownPreview ol {
-    list-style-position: outside;
-    padding-left: 20px; 
+  list-style-position: outside;
+  padding-left: 2.5em; 
 }
 
 .markdownPreview ul {
-    list-style-type: disc; 
+  list-style-type: disc; 
 }
 
 .markdownPreview ol {
-    list-style-type: decimal; 
+  list-style-type: decimal; 
 }
     
 .markdownPreview a {
-    color: blue; /* Sets the text color of links to blue */
-    text-decoration: underline; /* Underlines links for better visibility */
+  color: rgb(135, 135, 135);
+  text-decoration: underline; /* Underlines links for better visibility */
 }
 
-.markdownPreview blockquote {
-    padding: 0.5em 10px;
-    margin: 0.5em 0;
-    border-left: 4px solid #ccc; 
-    background-color: #f5f5f5; /* Light gray background, */
-    color: #666; /* Black */
-}
-  
 .markdownPreview h1,
 .markdownPreview h2,
 .markdownPreview h3,
@@ -93,50 +87,119 @@ body {
 .markdownPreview h6,
 .markdownPreview ul,
 .markdownPreview ol,
-.markdownPreview blockquote,
 .markdownPreview pre, /* for code blocks */
 .markdownPreview hr { /* for horizontal rules */
-  margin-bottom: 1em; /* Adjust as needed */
+  margin-bottom: 1.5em; /* Adjust as needed */
 }
 
 /* Remove bottom margin from the last element in a container */
 .markdownPreview > :last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 
 /* Blockquotes with more padding for better focus */
 .markdownPreview blockquote {
-padding: 0.5em 1em;
-margin: 1em 0;
+  padding: 0em 1em;
+  margin: 1em 0;
+  border-left: 4px solid #ccc; 
+  background-color: #f5f5f5; /* Light gray background, */
+  color: #666; /* Black */
+}
+
+.markdownPreview code {
+  padding: 0.15em 0.33em;
+  margin: 0em 0;
+  border-radius: 4px; /* Optional: rounded corners for code blocks */
+  overflow-x: auto; /* For horizontal scrolling if code overflows */
+}
+
+.markdownPreview pre {
+  padding: 1em;
+  margin: 1em 0;
+  border-radius: 4px; /* Optional: rounded corners for code blocks */
+  overflow-x: auto; /* For horizontal scrolling if code overflows */
 }
 
 /* Ensure code blocks are visually distinct */
-.markdownPreview pre {
-padding: 1em;
-margin: 1em 0;
-background-color: #f5f5f5; /* Light gray background */
-border-radius: 4px; /* Optional: rounded corners for code blocks */
-overflow-x: auto; /* For horizontal scrolling if code overflows */
-}
 
 /* Light mode styles */
-.markdownEditor {
-  background-color: white; /* Default background */
-  color: #171717; /* Default text color */
+@media (prefers-color-scheme: light) {
+  .markdownPreview pre {
+    background-color: #d3d3d3dc; /* Set the text color for code blocks in light mode */
+  }
+  .markdownPreview pre {
+    background-color: #e0e0e0; /* Light gray background for code blocks */
+    color: black;
+  }  
+  .markdownPreview code {
+    background-color: #c0c0c0; /* Lighter gray background for inline code */
+    color: black;
+  }  
+  .markdownPreview pre code {
+    background-color: inherit; /* Ensures consistency with the parent pre element */
+  }  
+
+  .is-empty::before {
+    color: #747373;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;    
+  }
 }
+
 
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
-  .markdownEditor {
-    background-color: #171717; /* Dark mode background */
-    color: white; /* Dark mode text color */
+  .markdownPreview pre {
+    background-color: #202020; /* Dark gray background */
+    color: white
+  }  
+  .markdownPreview code {
+    background-color: #414040; /* Dark gray background */
+    color: white
+  }  
+  .markdownPreview pre code {
+    background-color: inherit; /* Makes background the same as its parent pre */
   }
 
   .markdownPreview {
     background-color: #171717; /* Darker shade for preview mode */
     color: #ddd; /* Lighter text for readability */
+    caret-color: white
+  }
+  .markdownPreview blockquote {
+    background-color: #171717;
+    color: #7a7878
   }
 
-  /* Add other dark mode specific styles here */
+  .is-empty::before {
+    color: #7a7878;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;    
+  }
+}
+  
+
+.markdownPreview .is-editor-empty:first-child::before {
+  color: #ddd; 
+  content: "Untitled document";
+  float: left;
+  height: 0;
+  pointer-events: none;    
+}
+
+
+.markdownPreview .ProseMirror {
+  min-height: 5em; 
+  overflow: auto; 
+  min-width: 10em; 
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px; 
+  box-sizing: border-box; 
 }
