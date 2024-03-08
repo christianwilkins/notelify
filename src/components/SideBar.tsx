@@ -69,7 +69,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -83,7 +83,7 @@ export default function SideBar() {
             <li className="hs-accordion" id="users-accordion">
               <button
                 type="button"
-                className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm  rounded-lg  hover:bg-gray-200 dark:hover:bg-[#39383F] dark:bg-[#252427]" 
+                className="hs-accordion-toggle hs-accordion-active:text-blue-600 hs-accordion-active:hover:bg-transparent w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm  rounded-lg  hover:bg-gray-200 dark:hover:bg-[#39383F] dark:bg-[#252427]"
               >
                 <svg
                   className="w-4 h-4"
@@ -93,7 +93,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -111,7 +111,7 @@ export default function SideBar() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
@@ -128,7 +128,7 @@ export default function SideBar() {
                   <path
                     d="M2 5L8.16086 10.6869C8.35239 10.8637 8.64761 10.8637 8.83914 10.6869L15 5"
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                     stroke-linecap="round"
                   ></path>
                 </svg>
@@ -156,7 +156,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -170,7 +170,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -224,7 +224,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -238,7 +238,7 @@ export default function SideBar() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="2"
+                        strokeWidth="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
                       >
@@ -281,8 +281,7 @@ export default function SideBar() {
                 </ul>
               </div>
             </li>
-
-            </ul>
+          </ul>
         </nav>
       </div>
       {showRestoreButton && (

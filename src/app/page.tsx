@@ -2,20 +2,102 @@
 import Image from "next/image";
 import AudioCaptureButton from "@/components/DesktopAudio";
 import SideBar from "@/components/SideBar";
-import MDEditor from "@uiw/react-md-editor";
 import React, { useEffect, useRef, useState } from "react";
-import MarkdownEditor from "@/components/Markdown";
+import ModifiedEditor, { ModifiedEditorHandle } from "@/components/Editor";
+import { OpenAI } from "openai";
+import * as dotenv from "dotenv";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
 
+dotenv.config();
+
+const openaiKey = process.env.OPENAI_API_KEY as string;
+const openai = new OpenAI({
+  apiKey: openaiKey,
+  /* apiKey: "", */
+  dangerouslyAllowBrowser: true, // lmao
+});
+
 export default function Home() {
+  const [generatedResponses, setGeneratedResponses] = useState("");
   const [finalTranscript, setFinalTranscript] = useState("");
   const [transcriptBoxValue, setTranscriptBoxValue] = useState("");
   const transcriptRef = useRef<HTMLDivElement>(null);
-  //let recognition: any;
   const recognition = useRef<any>(null);
 
+  const conversationContext: any[][] = [];
+  const currentMessages: { role: string; content: any }[] = [];
+  const transcriptWordCount: string[] = [];
+  const increment: number = 50;
+  let apiThreshold: number = increment;
+
+  const editorRef = useRef<ModifiedEditorHandle>(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      setIsEditorReady(true);
+    }
+  }, [editorRef]);
+
+  const setEditorContent = (content: string) => {
+    if (isEditorReady && editorRef.current) {
+      editorRef.current.setContent(content);
+    }
+  };
+
+  const appendEditorContent = (content: string) => {
+    if (isEditorReady && editorRef.current) {
+      editorRef.current.appendContent(content);
+    }
+  };
+
+  const generateResponseWithDelay = async (
+    chunks: string[]
+  ): Promise<string> => {
+    try {
+      const transcribedText = chunks.join(" ");
+      // The prompt should clearly indicate where the transcribed text starts.
+      const prompt = `
+  Transcribed Text:
+  ${transcribedText}
+  
+  Convert the above transcribed text into key points and main ideas using Markdown, which splits words and text into headers/headings, bullet points, bolding, italics, underlines, etc. (and any combination thereof)? Ensure YOU DO NOT deviate from this style format for every message given to you. Sometimes, the message will not be long enough, and you may need to wait a bit before processing the file. DO NOT just convert text to markdown. Highlight what is important information to take out from the provided conversation using a traditional style guide. Create it as if you were writing detailed notes with important examples. Do not miss out on information. Ensure the generated text includes relevant details about the topic discussed. Please additionally add a summary at the end or a conclusion. Adapt the response to the context of the conversation, including concepts, examples, and any recommended style guide. Output generated markdown as a code block. Do not allow the generated text to fall outside the code block    
+  `;
+      const modelId = "gpt-3.5-turbo-instruct"; // Or the latest model ID
+      // Update this with the correct model id for version 4.0.0
+
+      // Restore the previous context
+      for (const [inputText, responseText] of conversationContext) {
+        currentMessages.push({ role: "user", content: inputText });
+        currentMessages.push({ role: "assistant", content: responseText });
+      }
+
+      // Stores the new message
+      currentMessages.push({ role: "user", content: prompt });
+
+      const result = await openai.completions.create({
+        model: modelId,
+        prompt: prompt,
+        max_tokens: 500,
+      });
+
+      const responseText = result.choices[0].text;
+      conversationContext.push([prompt, responseText]);
+
+      return responseText;
+    } catch (err) {
+      console.error(err);
+    }
+    return "";
+  };
+
+  const generateResponse = async (chunks: string[]): Promise<string> => {
+    const response = await generateResponseWithDelay(chunks);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Add a 1-second delay between requests
+    return response;
+  };
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       recognition.current = new webkitSpeechRecognition();
@@ -32,27 +114,59 @@ export default function Home() {
         "Your browser does not support the Web Speech API. Please try another browser."
       );
     } else {
-      //recognition = new webkitSpeechRecognition();
+      recognition.current = new webkitSpeechRecognition();
       recognition.current.continuous = true;
       recognition.current.interimResults = true;
+      setEditorContent("### api editor content");
 
-      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
+      recognition.current.onresult = async (event: {
+        resultIndex: any;
+        results: string | any[];
+      }) => {
         let interimTranscript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           let currentResult = event.results[i];
+          // console.log("Current result: ", currentResult);
           if (currentResult.isFinal) {
-            setTranscriptBoxValue(
-              (prevValue) => prevValue + " " + currentResult[0].transcript
+            setEditorContent("updating editor content");
+            console.log(
+              "transcript from result: ",
+              currentResult[0].transcript
             );
+            const transcript: string = currentResult[0].transcript;
+            setTranscriptBoxValue((prevValue) => prevValue + transcript);
+
+            transcriptWordCount.push(...transcript.split(" "));
+            console.log("Transcript word count object: ", transcriptWordCount);
+
+            // Check if the accumulated words since the last API call are more than or equal to 250
+            if (transcriptWordCount.length >= apiThreshold) {
+              appendEditorContent("### api editor content");
+
+              console.log(
+                apiThreshold,
+                " words have been recognized. Calling the API with the full transcript."
+              );
+              apiThreshold += increment;
+
+              // Send the chunks to the API and handle the response
+              const response = await generateResponse(transcriptWordCount);
+              console.log(response);
+              setEditorContent("# api editor content(1)" + response);
+            } else {
+              // Otherwise, just update the word count
+              // setWordCount(newWordCount);
+            }
           }
+
           interimTranscript += currentResult[0].transcript;
         }
+
         if (transcriptRef.current) {
           transcriptRef.current.innerText =
             finalTranscript + " " + interimTranscript;
         }
       };
-
       recognition.current.start();
     }
   };
@@ -106,12 +220,19 @@ export default function Home() {
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
-          <h1 style={{ fontSize: "60px", fontWeight: "450" }}>
+          <h1
+            style={{
+              fontSize: "60px",
+              fontWeight: "450",
+              marginBottom: "20px",
+            }}
+          >
             GPT Finds Title
           </h1>
         </div>
-        <MarkdownEditor />
-        
+        <div>
+          <ModifiedEditor ref={editorRef}></ModifiedEditor>
+        </div>
         <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
 
         <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 text-white p-2.5 rounded-full">
