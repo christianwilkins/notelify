@@ -16,12 +16,13 @@
  *   Again, this is a limitation of the browsers themselves, and not this component.
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import transcribe from '@/API/transcribe';
 
 const AudioCaptureButton = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [chunks, setChunks] = useState<BlobPart[]>([]);
+  let chunks: BlobPart[] = [];
 
   const captureAudio = async () => {
     try {
@@ -30,20 +31,27 @@ const AudioCaptureButton = () => {
         audio: true
       });
 
+      // Remove video tracks from the MediaStream
+      mediaStream.getVideoTracks().forEach(track => track.stop());
+
       const recorder = new MediaRecorder(mediaStream);
       setMediaRecorder(recorder);
 
-      recorder.ondataavailable = (e) => {
-        setChunks((prev) => {
-          const updatedChunks = [...prev, e.data];
-          const blob = new Blob(updatedChunks, { 'type' : 'audio/wav; codecs=opus' });
-          const audioURL = window.URL.createObjectURL(blob);
-          if (audioRef.current) {
-            audioRef.current.src = audioURL;
-          }
-          return updatedChunks;
-        });
-      };
+      recorder.ondataavailable = async (e) => {
+        // We only want to keep the very first audio data and the latest e.data
+        // The first audio data is required since it contains the header of the WAV file.
+        if (chunks.length > 1) {
+          chunks.pop();
+        }
+        chunks.push(e.data);
+
+        const blob = new Blob(chunks, { "type" : "video/x-matroska;codecs=avc1,opus" });
+        const audioURL = window.URL.createObjectURL(blob);
+        if (audioRef.current) {
+          audioRef.current.src = audioURL;
+        }
+        transcribe(blob);
+      }
 
       // Instead of providing a "Stop Capture" button, we can just stop the capture when the mediaStream ends.
       mediaStream.getTracks().forEach(track => {
@@ -53,8 +61,9 @@ const AudioCaptureButton = () => {
           }
         };
       });
-
-      recorder.start();
+      
+      // We want the transcription to be done in real-time, so we will set the interval to 5 seconds. 
+      recorder.start(5000);
     } catch (err) {
       console.error('Error capturing audio', err);
     }
