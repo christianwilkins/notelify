@@ -26,10 +26,10 @@ const summarize = async (text: string, openAiInstance: any) => {
         model: "gpt-3.5-turbo-instruct",
         prompt: prompt,
         max_tokens: 500,
-    }).then((res) => {
+    }).then((res: any) => {
         console.log(res.choices[0].text);
         return res;
-    }).catch((err) => { console.error(err); });
+    }).catch((err: any) => { console.error(err); });
     return response;
 }
 
