@@ -19,7 +19,7 @@
 import { useRef, useState } from 'react';
 import transcribe from '@/API/transcribe';
 
-const AudioCaptureButton = () => {
+const AudioCaptureButton = ({ editorRef }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   let chunks: BlobPart[] = [];
@@ -50,7 +50,7 @@ const AudioCaptureButton = () => {
         if (audioRef.current) {
           audioRef.current.src = audioURL;
         }
-        transcribe(blob);
+        transcribe(blob, editorRef);
       }
 
       // Instead of providing a "Stop Capture" button, we can just stop the capture when the mediaStream ends.
@@ -63,7 +63,7 @@ const AudioCaptureButton = () => {
       });
       
       // We want the transcription to be done in real-time, so we will set the interval to 5 seconds. 
-      recorder.start(5000);
+      recorder.start(10000);
     } catch (err) {
       console.error('Error capturing audio', err);
     }
