@@ -59,7 +59,7 @@ const summarize = async (text: string, editorRef: any) => {
         model: "gpt-3.5-turbo-instruct",
         prompt: prompt,
         max_tokens: 500,
-    }).then((res) => {
+    }).then((res:any) => {
         let summary = res.choices[0].text;
         editorRef.current.setContent(summary)
     }).catch((err) => { console.error(err); });
