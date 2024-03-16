@@ -17,12 +17,25 @@
  */
 
 import { useRef, useState } from 'react';
-import transcribe from '@/API/transcribe';
+import BackendAudioAPI from '@/API/DesktopAudioBackend';
+import { ModifiedEditorHandle } from "@/components/Editor";
 
-const AudioCaptureButton = ({ editorRef }) => {
+interface AudioCaptureButtonProps {
+	editorRef: React.RefObject<ModifiedEditorHandle>
+}
+
+const AudioCaptureButton: React.FC<AudioCaptureButtonProps> = ({ editorRef }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   let chunks: BlobPart[] = [];
+
+  // Setting up variables to handle transcription of text
+  let firstString: string = "";
+  let transcriptionText: string = "";
+  let transcriptionIteration: number = 0;
+
+  // Initialize the Backend Audio API Service
+  let audioBackend = new BackendAudioAPI();
 
   const captureAudio = async () => {
     try {
@@ -50,7 +63,28 @@ const AudioCaptureButton = ({ editorRef }) => {
         if (audioRef.current) {
           audioRef.current.src = audioURL;
         }
-        transcribe(blob, editorRef);
+
+		// Transcribing the audio
+		if (transcriptionIteration === 0) {
+			// If we have just started the transcription, we want to store the first string separately
+			audioBackend.transcribe(blob).then(text => {
+				firstString = text;
+			})
+			transcriptionText = firstString;
+			transcriptionIteration++;
+		}
+
+		if (transcriptionIteration > 0) {
+			audioBackend.transcribe(blob).then(text => {
+				transcriptionText += text.slice(firstString.length, text.length).trim();
+			});
+		}	
+
+		// Summarizing the transcribed text 
+		audioBackend.summarize(transcriptionText).then(summary => {
+			// and displaying it directly into the editor
+			editorRef.current?.setContent(summary);
+		})
       }
 
       // Instead of providing a "Stop Capture" button, we can just stop the capture when the mediaStream ends.
