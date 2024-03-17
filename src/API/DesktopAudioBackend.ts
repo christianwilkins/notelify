@@ -56,10 +56,10 @@ class BackendAudioAPI {
             model: "gpt-3.5-turbo-instruct",
             prompt: prompt,
             max_tokens: 500,
-        }).then((res) => {
+        }).then((res: OpenAI.Completions.Completion) => {
             let summary = res.choices[0].text;
             return summary
-        }).catch((err) => { 
+        }).catch((err: any) => { 
             console.error(err); 
             return "";
         });
