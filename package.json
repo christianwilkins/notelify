@@ -25,6 +25,7 @@
     "next": "14.0.1",
     "next-seo": "^6.4.0",
     "openai": "^4.0.0",
+    "package.json": "^2.0.1",
     "prompt-sync": "^4.2.0",
     "react": "^18",
     "react-dom": "^18",
