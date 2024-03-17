@@ -2,7 +2,7 @@
 This component is used for accessing and processing audio from the user's end. It is capable of
 processing both the audio from the user's microphone and audio from the user's desktop.
 It uses a custom BackendAudioAPI functionality to transcribe and summarize the audio from either source.
-The component consists of a generic function CaptureAudioGeneric that houses most of the funtionality
+The component consists of a generic function CaptureAudioGeneric that houses most of the functionality
 of the component. It is then used to create two separate components, MicAudioButton and DesktopAudioButton,
 that are used to capture audio from the user's microphone and desktop respectively.
 
@@ -15,8 +15,8 @@ from the user's desktop. This method is used to capture both audio and video fro
 component only captures audio from the user's desktop. The video tracks are removed from the MediaStream before processing.
 */
 
-import { useRef, useState } from 'react';
-import BackendAudioAPI from '@/API/DesktopAudioBackend';
+import { useState } from 'react';
+import BackendAudioAPI from '@/API/AudioBackend';
 
 // Initializing the Backend Audio Services
 let audioBackend = new BackendAudioAPI();
@@ -79,27 +79,33 @@ const CaptureAudioGeneric = (
                     // Create a new blob of the first and latest chunk
                     const blob = new Blob(chunks, { "type": "audio/wav;codecs=opus" });
 
-                    // Transcribing the audio
-                    if (transcriptionIteration === 0) {
-                        // If we have just started the transcription, we want to store the first string separately
-                        audioBackend.transcribe(blob).then(text => {
-                            firstString = text;
+                    // Checking if the user is speaking
+                    let speaking = await audioBackend.isSpeaking(mediaStream);
+
+                    // Only if the user is speaking will we want to transcribe and summarize the audio
+                    if (speaking) {
+                        // Transcribing the audio
+                        if (transcriptionIteration === 0) {
+                            // If we have just started the transcription, we want to store the first string separately
+                            audioBackend.transcribe(blob).then(text => {
+                                firstString = text;
+                            })
+                            transcriptionText = firstString;
+                            transcriptionIteration++;
+                        }
+
+                        if (transcriptionIteration > 0) {
+                            audioBackend.transcribe(blob).then(text => {
+                                transcriptionText += text.slice(firstString.length, text.length).trim();
+                            });
+                        }
+
+                        // Summarizing the transcribed text
+                        audioBackend.summarize(transcriptionText).then(summary => {
+                            // and displaying it directly into the editor
+                            props.editorRef.current.setContent(summary);
                         })
-                        transcriptionText = firstString;
-                        transcriptionIteration++;
                     }
-
-                    if (transcriptionIteration > 0) {
-                        audioBackend.transcribe(blob).then(text => {
-                            transcriptionText += text.slice(firstString.length, text.length).trim();
-                        });
-                    }
-
-                    // Summarizing the transcribed text
-                    audioBackend.summarize(transcriptionText).then(summary => {
-                        // and displaying it directly into the editor
-                        props.editorRef.current.setContent(summary);
-                    })
                 }
     
                 recorder.start(timeSlice);
@@ -149,7 +155,7 @@ const MicAudioButton = CaptureAudioGeneric(
         }
     }),
     "Microphone",
-    5000
+    10000
 )
 
 const DesktopAudioButton = CaptureAudioGeneric(

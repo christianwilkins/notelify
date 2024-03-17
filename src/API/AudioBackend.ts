@@ -6,6 +6,7 @@ Whisper API. And, it also provides a method to summarize that transcribed string
 
 import OpenAI from "openai";
 import * as dotenv from "dotenv";
+import hark from "hark";
 
 // Set up environment variables
 dotenv.config();
@@ -64,6 +65,21 @@ class BackendAudioAPI {
             return "";
         });
         return response;
+    }
+
+    async isSpeaking(mediaStream: MediaStream): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const options = { threshold: -50, interval: 200 };
+            const speechEvents = hark(mediaStream, options);
+    
+            speechEvents.on('speaking', () => {
+                resolve(true);
+            });
+    
+            speechEvents.on('stopped_speaking', () => {
+                reject(false);
+            });
+        });
     }
     
 }
