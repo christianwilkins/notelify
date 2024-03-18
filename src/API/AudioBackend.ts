@@ -50,7 +50,18 @@ class BackendAudioAPI {
         information. Ensure the generated text includes relevant details about the topic discussed. 
         Please additionally add a summary at the end or a conclusion. Adapt the response to the context 
         of the conversation, including concepts, examples, and any recommended style guide. Output 
-        generated markdown as a code block. Do not allow the generated text to fall outside the code block.    
+        generated markdown as a code block. Do not allow the generated text to fall outside the code block.
+        
+        VERY IMPORTANT: The transcribed text may be formatted in this way: "The following text is from the 
+        user speaker: [transcribed text]" or "The following text is from the other speaker: [transcribed text]".
+        Here, the user speaker is the text from the user's microphone, and the other speaker is the text from 
+        their desktop, which could be a video call, a lecture, or a podcast. The idea here is that you need to take the
+        text from both the user and the other speaker (whatever that may be) and weave them together as coherently 
+        as you possible can. The final summary should be a combination of both the user and the other speaker's and
+        the summary MUST BE as natural as possible. Last but NOT THE LEAST, unless the two speakers are talking about very 
+        different things, avoid saying things like "speaker 1 said this" or "other speak said that". Instead, 
+        try to weave them together as naturally as possible. You can do it but just try to minimize it as much as possible. And,
+        do NOT use the sentence "The following text is from the user speaker" or "The following text is from the other speaker".
         `;
 
         const response = await openai.completions.create({
@@ -65,12 +76,6 @@ class BackendAudioAPI {
             return "";
         });
         return response;
-    }
-
-    // the context can ONLY be "Desktop" or "Microphone"
-    async contextualSummarize(text: string, context: "Desktop" | "Microphone"): Promise<string> {
-        
-        return "";
     }
 
     async isSpeaking(mediaStream: MediaStream): Promise<boolean> {
