@@ -1,19 +1,19 @@
-/*
-This component is used for accessing and processing audio from the user's end. It is capable of
-processing both the audio from the user's microphone and audio from the user's desktop.
-It uses a custom BackendAudioAPI functionality to transcribe and summarize the audio from either source.
-The component consists of a generic function CaptureAudioGeneric that houses most of the functionality
-of the component. It is then used to create two separate components, MicAudioButton and DesktopAudioButton,
-that are used to capture audio from the user's microphone and desktop respectively.
+// /*
+//  This component is used for accessing and processing audio from the user's end. It is capable of
+// processing both the audio from the user's microphone and audio from the user's desktop.
+// It uses a custom BackendAudioAPI functionality to transcribe and summarize the audio from either source.
+// The component consists of a generic function CaptureAudioGeneric that houses most of the functionality
+// of the component. It is then used to create two separate components, MicAudioButton and DesktopAudioButton,
+// that are used to capture audio from the user's microphone and desktop respectively.
 
-For the MicAudioButton, the component uses the navigator.mediaDevices.getUserMedia() method to capture audio
-from the user's microphone. A good thing about getUserMedia() is that it allows echoCancellation, noiseSuppression,
-and autoGainControl, which are all very useful for capturing clear audio. 
+// For the MicAudioButton, the component uses the navigator.mediaDevices.getUserMedia() method to capture audio
+// from the user's microphone. A good thing about getUserMedia() is that it allows echoCancellation, noiseSuppression,
+// and autoGainControl, which are all very useful for capturing clear audio. 
 
-For the DesktopAudioButton, the component uses the navigator.mediaDevices.getDisplayMedia() method to capture audio
-from the user's desktop. This method is used to capture both audio and video from the user's desktop. However, the 
-component only captures audio from the user's desktop. The video tracks are removed from the MediaStream before processing.
-*/
+// For the DesktopAudioButton, the component uses the navigator.mediaDevices.getDisplayMedia() method to capture audio
+// from the user's desktop. This method is used to capture both audio and video from the user's desktop. However, the 
+// component only captures audio from the user's desktop. The video tracks are removed from the MediaStream before processing.
+// */
 
 import { useState } from 'react';
 import BackendAudioAPI from '@/API/AudioBackend';
@@ -22,9 +22,15 @@ import BackendAudioAPI from '@/API/AudioBackend';
 let audioBackend = new BackendAudioAPI();
 
 // Setting up universal variables to keep track of transcription
-let firstString: string = "";
-let transcriptionText: string = "";
-let transcriptionIteration: number = 0;
+let firstStringMic: string = "";
+let transcriptionTextMic: string = "";
+let transcriptionIterationMic: number = 0;
+
+let firstStringDesktop: string = "";
+let transcriptionTextDesktop: string = "";
+let transcriptionIterationDesktop: number = 0;
+
+let overallTranscription: string = "";
 
 const CaptureAudioGeneric = (
     /**
@@ -42,6 +48,9 @@ const CaptureAudioGeneric = (
     return (props: any) => {
         const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
         const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+        let firstString: string;
+        let transcriptionText: string;
+        let transcriptionIteration: number;
         let chunks: BlobPart[] = [];
 
         const captureAudio = async () => {
@@ -63,6 +72,18 @@ const CaptureAudioGeneric = (
                             }
                         };
                     });
+
+                    // And we would want the transcription-tracking variables to de specific to desktop
+                    firstString = firstStringDesktop;
+                    transcriptionText = transcriptionTextDesktop;
+                    transcriptionIteration = transcriptionIterationDesktop;
+                }
+
+                if (captureFrom === "Microphone") {
+                    // We would want the transcription-tracking variables to be specific to microphone
+                    firstString = firstStringMic;
+                    transcriptionText = transcriptionTextMic;
+                    transcriptionIteration = transcriptionIterationMic;
                 }
     
                 const recorder = new MediaRecorder(mediaStream);
@@ -100,12 +121,25 @@ const CaptureAudioGeneric = (
                             });
                         }
 
+                        // We now update the overall transcription to be the transcription from both the microphone and desktop
+                        let speaker: string;
+                        if (captureFrom === "Microphone") {
+                            speaker = "user";
+                        } else {
+                            speaker = "other person";
+                        }
+                        overallTranscription += `\n The following text is from the ${speaker} speaker` + transcriptionText + "\n";
+
                         // Summarizing the transcribed text
-                        audioBackend.summarize(transcriptionText).then(summary => {
+                        audioBackend.summarize(overallTranscription).then(summary => {
                             // and displaying it directly into the editor
                             props.editorRef.current.setContent(summary);
                         })
+
+                        console.log(overallTranscription);
                     }
+
+                    
                 }
     
                 recorder.start(timeSlice);
