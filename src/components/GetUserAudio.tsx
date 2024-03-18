@@ -122,26 +122,24 @@ const CaptureAudioGeneric = (
                         }
 
                         // We now update the overall transcription to be the transcription from both the microphone and desktop
-                        let speaker: string;
                         if (captureFrom === "Microphone") {
-                            speaker = "user";
+                            transcriptionTextMic = transcriptionText;
                         } else {
-                            speaker = "other person";
+                            transcriptionTextDesktop = transcriptionText;
                         }
-                        overallTranscription += `\n The following text is from the ${speaker} speaker` + transcriptionText + "\n";
+                        
+                        let micText = "\n The following text is from the user speaker: \n" + transcriptionTextMic + "\n";
+                        let desktopText = "\n The following text is from the other speaker: \n" + transcriptionTextDesktop + "\n";
+                        overallTranscription = micText + desktopText;
 
                         // Summarizing the transcribed text
                         audioBackend.summarize(overallTranscription).then(summary => {
                             // and displaying it directly into the editor
                             props.editorRef.current.setContent(summary);
                         })
-
-                        console.log(overallTranscription);
                     }
-
                     
                 }
-    
                 recorder.start(timeSlice);
             } 
             catch (err) {
