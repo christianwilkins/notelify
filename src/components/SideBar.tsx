@@ -1,11 +1,24 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
+import HamburgerButton from "./HamburgerButton";
 
 export default function SideBar() {
   const [expanded, setExpanded] = useState(true);
   const [showRestoreButton, setShowRestoreButton] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [pinMsg, setPinMsg] = useState(false);
+  let isPinned = false;
+
+  const togglePin = () => {
+    setPinMsg(!pinMsg);
+    isPinned = !isPinned;
+  };
+
+  const restoreSidebar = () => {
+    setExpanded(true);
+    setShowRestoreButton(false);
+  };
 
   const toggleSidebar = () => {
     setExpanded(!expanded);
@@ -15,14 +28,10 @@ export default function SideBar() {
     const sidebar = sidebarRef.current;
 
     if (expanded && sidebar && !sidebar.contains(event.target as Node)) {
+      if (isPinned) return;
       setExpanded(false);
       setShowRestoreButton(true);
     }
-  };
-
-  const restoreSidebar = () => {
-    setExpanded(true);
-    setShowRestoreButton(false);
   };
 
   useEffect(() => {
@@ -55,6 +64,7 @@ export default function SideBar() {
           className="hs-accordion-group p-6 w-full flex flex-col flex-wrap"
           data-hs-accordion-always-open
         >
+          
           <ul className="space-y-1.5">
             <li>
               <a
@@ -282,16 +292,17 @@ export default function SideBar() {
               </div>
             </li>
           </ul>
+          <button onClick={togglePin} aria-label={isPinned ? 'Unpin' : 'Pin'}>
+    {isPinned ? (
+      <div className="unpin-style">Unpin Content</div>
+    ) : (
+      <div className="pin-style">Pin Content</div>
+    )}
+  </button>
         </nav>
       </div>
       {showRestoreButton && (
-        <button
-          type="button"
-          className="fixed bottom-4 start-4 bg-gray-500 text-white px-4 py-2 rounded-md"
-          onClick={restoreSidebar}
-        >
-          Restore Sidebar
-        </button>
+        <HamburgerButton toggle={restoreSidebar} />
       )}
     </>
   );
