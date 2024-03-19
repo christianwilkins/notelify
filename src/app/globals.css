@@ -2,279 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Write your global styles here. This is using Tailwind's `@apply` directive for classes you want to reuse. */
+/* Example: */
 
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  @apply dark:bg-[#171717] dark:text-white;
-  @apply font-sans;
+:root {
+  --sidebar-bg-color: #111827; /* Sidebar background color */
+  --sidebar-text-color: #9CA3AF; /* Sidebar text color */
+  --sidebar-active-color: #FFFFFF; /* Sidebar active text color */
+  --sidebar-active-bg-color: #2563EB; /* Sidebar active background color */
+  --note-bg-color: #1F2937; /* Note background color */
+  --note-border-color: #2D3748; /* Note border color */
+  --note-text-color: #FFFFFF; /* Note text color */
+  --header-bg-color: #111827; /* Header background color */
+  --main-bg-color: #0F172A; /* Main background color */
+  --accent-color: #10B981; /* Accent color for buttons and icons */
 }
 
-/* components/MarkdownEditor.module.css */
-
-.markdownPreview h1 {
-  content: attr(data-placeholder);
-  font-size: 2em;
-  margin-bottom: 0.5em;
+/* This will apply the necessary styles to all buttons in your app */
+button {
+  @apply px-4 py-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50;
 }
 
-.markdownPreview h2 {
-  font-size: 1.5em;
-  margin-bottom: 0.5em;
+/* Customizing scrollbar for the whole app (if necessary) */
+::-webkit-scrollbar {
+  @apply w-2.5 bg-gray-700;
 }
 
-.markdownPreview h3 {
-  font-size: 1.17em;
-  margin-bottom: 0.5em;
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded;
 }
 
-.markdownPreview li {
-  margin-bottom: 0.25em;
-}
-  
-/* Adjust padding for nested paragraphs within list items */
-.markdownPreview li p {
-  margin-bottom: 0.25em;
-  padding-left: 1em; /* Adjust as needed */
-}
-
-/* Ensure the first paragraph has no top margin to align with the bullet/number */
-.markdownPreview li > p:first-child {
-  margin-top: 0;
-}
-
-.markdownPreview ul,
-.markdownPreview ol {
-  list-style-position: outside;
-  padding-left: 2.5em; 
-}
-
-.markdownPreview ul {
-  list-style-type: disc; 
-}
-
-.markdownPreview ol {
-  list-style-type: decimal; 
-}
-    
-.markdownPreview a {
-  color: rgb(135, 135, 135);
-  text-decoration: underline; /* Underlines links for better visibility */
-}
-
-.markdownPreview h1,
-.markdownPreview h2,
-.markdownPreview h3,
-.markdownPreview h4,
-.markdownPreview h5,
-.markdownPreview h6 {
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
-.markdownPreview p,
-.markdownPreview h1,
-.markdownPreview h2,
-.markdownPreview h3,
-.markdownPreview h4,
-.markdownPreview h5,
-.markdownPreview h6,
-.markdownPreview ul,
-.markdownPreview ol,
-.markdownPreview pre, /* for code blocks */
-.markdownPreview hr { /* for horizontal rules */
-  margin-bottom: 1.5em; /* Adjust as needed */
-}
-
-/* Remove bottom margin from the last element in a container */
-.markdownPreview > :last-child {
-  margin-bottom: 0;
-}
-
-
-/* Blockquotes with more padding for better focus */
-.markdownPreview blockquote {
-  padding: 0em 1em;
-  margin: 1em 0;
-  border-left: 4px solid #ccc; 
-  background-color: #f5f5f5; /* Light gray background, */
-  color: #666; /* Black */
-}
-
-.markdownPreview code {
-  padding: 0.15em 0.33em;
-  margin: 0em 0;
-  border-radius: 4px; /* Optional: rounded corners for code blocks */
-  overflow-x: auto; /* For horizontal scrolling if code overflows */
-}
-
-.markdownPreview pre {
-  padding: 1em;
-  margin: 1em 0;
-  border-radius: 4px; /* Optional: rounded corners for code blocks */
-  overflow-x: auto; /* For horizontal scrolling if code overflows */
-}
-
-/* Ensure code blocks are visually distinct */
-
-/* Light mode styles */
-@media (prefers-color-scheme: light) {
-  .markdownPreview pre {
-    background-color: #d3d3d3dc; /* Set the text color for code blocks in light mode */
-  }
-  .markdownPreview pre {
-    background-color: #e0e0e0; /* Light gray background for code blocks */
-    color: black;
-  }  
-  .markdownPreview code {
-    background-color: #c0c0c0; /* Lighter gray background for inline code */
-    color: black;
-  }  
-  .markdownPreview pre code {
-    background-color: inherit; /* Ensures consistency with the parent pre element */
-  }  
-
-  .is-empty::before {
-    color: #747373;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;    
-  }
-}
-
-
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-  .markdownPreview pre {
-    background-color: #202020; /* Dark gray background */
-    color: white
-  }  
-  .markdownPreview code {
-    background-color: #414040; /* Dark gray background */
-    color: white
-  }  
-  .markdownPreview pre code {
-    background-color: inherit; /* Makes background the same as its parent pre */
-  }
-
-  .markdownPreview {
-    background-color: #171717; /* Darker shade for preview mode */
-    color: #ddd; /* Lighter text for readability */
-    caret-color: white
-  }
-  .markdownPreview blockquote {
-    background-color: #171717;
-    color: #7a7878
-  }
-
-  .is-empty::before {
-    color: #7a7878;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;    
-  }
-}
-  
-
-.markdownPreview .is-editor-empty:first-child::before {
-  color: #ddd; 
-  content: "Untitled document";
-  float: left;
-  height: 0;
-  pointer-events: none;    
-}
-
-
-.markdownPreview .ProseMirror {
-  min-height: 5em; 
-  overflow: auto; 
-  min-width: 10em; 
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 20px; 
-  box-sizing: border-box; 
-}
-
-/* styles/global.css */
-.hamburger {
-  padding: 15px;
-  display: inline-block;
-  cursor: pointer;
-  transition-property: opacity, filter;
-  transition-duration: 0.15s;
-  transition-timing-function: linear;
-  font: inherit;
-  color: inherit;
-  text-transform: none;
-  background-color: transparent;
-  border: 0;
-  margin: 0;
-  overflow: visible;
-}
-
-.hamburger-box {
-  width: 40px;
-  height: 24px;
-  display: inline-block;
-  position: relative;
-}
-
-.hamburger-inner {
-  @apply bg-current;
-  position: absolute;
-  width: 40px;
-  height: 4px;
-  border-radius: 4px;
-  top: 50%;
-  left: 0;
-  transform: translateY(-2px);
-  transition: background-color 0.15s ease-in-out;
-}
-
-.hamburger-inner::before,
-.hamburger-inner::after {
-  @apply bg-current;
-  content: '';
-  display: block;
-  width: 40px;
-  height: 4px;
-  border-radius: 4px;
-  position: absolute;
-  transition: transform 0.15s ease-in-out;
-}
-
-.hamburger-inner::before {
-  top: -10px;
-}
-
-.hamburger-inner::after {
-  bottom: -10px;
-}
-
-/* Squeeze animation */
-.hamburger--squeeze.is-active .hamburger-inner {
-  transform: rotate(45deg);
-  transition-delay: 0.12s;
-  transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-}
-
-.hamburger--squeeze.is-active .hamburger-inner::before {
-  top: 0;
-  opacity: 0;
-  transition: top 0.075s ease, opacity 0.075s 0.12s ease;
-}
-
-.hamburger--squeeze.is-active .hamburger-inner::after {
-  bottom: 0;
-  transform: rotate(-90deg);
-  transition: bottom 0.075s ease, transform 0.075s 0.12s cubic-bezier(0.215, 0.61, 0.355, 1);
-}
+/* Any other global styles you want to add */
