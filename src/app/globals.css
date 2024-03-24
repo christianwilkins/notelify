@@ -73,4 +73,113 @@
   body {
     height: 100vh;
   }
+
+  .markdownPreview h1 {
+  content: attr(data-placeholder);
+  font-size: 2em;
+  margin-bottom: 0.5em;
+  }
+
+  .markdownPreview h2 {
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+  }
+
+  .markdownPreview h3 {
+  font-size: 1.17em;
+  margin-bottom: 0.5em;
+  }
+
+  .markdownPreview li {
+  margin-bottom: 0.25em;
 }
+
+/* Adjust padding for nested paragraphs within list items */
+.markdownPreview li p {
+  margin-bottom: 0.25em;
+  padding-left: 1em; /* Adjust as needed */
+}
+
+.markdownPreview li > p:first-child {
+  margin-top: 0;
+}
+
+.markdownPreview ul,
+.markdownPreview ol {
+  list-style-position: outside;
+  padding-left: 2.5em; 
+}
+
+.markdownPreview ul {
+  list-style-type: disc; 
+}
+
+.markdownPreview ol {
+  list-style-type: decimal; 
+}
+
+.markdownPreview a {
+  color: rgb(135, 135, 135);
+  text-decoration: underline; /* Underlines links for better visibility */
+}
+
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4,
+.markdownPreview h5,
+.markdownPreview h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.markdownPreview p,
+.markdownPreview h1,
+.markdownPreview h2,
+.markdownPreview h3,
+.markdownPreview h4,
+.markdownPreview h5,
+.markdownPreview h6,
+.markdownPreview ul,
+.markdownPreview ol,
+.markdownPreview pre, /* for code blocks */
+.markdownPreview hr { /* for horizontal rules */
+  margin-bottom: 1.5em; /* Adjust as needed */
+}
+
+
+.markdownPreview blockquote {
+    background-color: #171717;
+    color: #7a7878
+  }
+
+  .is-empty::before {
+    color: #7a7878;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;    
+  }
+}
+
+
+.markdownPreview .is-editor-empty:first-child::before {
+  color: #ddd; 
+  content: "Untitled document";
+  float: left;
+  height: 0;
+  pointer-events: none;    
+}
+
+
+.markdownPreview .ProseMirror {
+  min-height: 5em; 
+  overflow: auto; 
+  min-width: 10em; 
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px; 
+  box-sizing: border-box; 
+}
+
