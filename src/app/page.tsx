@@ -39,7 +39,7 @@ export default function Home() {
   return (
     <>
       <SideBar></SideBar>
-      <main className="flex flex-col items-center justify-between p-24 bg-white dark:bg-[#171717]">
+      <main className="flex flex-col items-center justify-between p-24">
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         <div>
@@ -56,17 +56,17 @@ export default function Home() {
         <div>
           <ModifiedEditor ref={editorRef}></ModifiedEditor>
         </div>
-        <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full bg-gray-200 text-white"></button>
+        <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full"></button>
 
-        <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 text-white p-2.5 rounded-full">
+        <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 p-2.5 rounded-full">
           <button
-            className="absolute right-12 top-1 h-3 w-3 rounded-full bg-green-500 text-white"
+            className="absolute right-12 top-1 h-3 w-3 rounded-full bg-green-500"
           ></button>
           <button
-            className="absolute right-7 top-1 h-3 w-3 rounded-full bg-yellow-500 text-white"
+            className="absolute right-7 top-1 h-3 w-3 rounded-full bg-yellow-500"
           ></button>
           <button
-            className="absolute right-2 top-1 h-3 w-3 rounded-full bg-red-500 text-white"
+            className="absolute right-2 top-1 h-3 w-3 rounded-full bg-red-500"
           ></button>
         </div>
         <DesktopAudioButton editorRef={editorRef}/>
