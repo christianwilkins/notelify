@@ -134,6 +134,7 @@ const CaptureAudioGeneric = (
 
                         // Summarizing the transcribed text
                         audioBackend.summarize(overallTranscription).then(summary => {
+
                             // and displaying it directly into the editor
                             props.editorRef.current.setContent(summary);
                         })
