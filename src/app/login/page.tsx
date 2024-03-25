@@ -1,7 +1,7 @@
 "use client"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useState } from 'react'
-import {handleSignIn, handleSignUp, loginWithGoogle} from './utils'
+import { useRouter } from 'next/navigation'
 
 import {
   Card,
@@ -20,6 +20,40 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
+  
+  const supabase = createClientComponentClient()
+  
+  const handleSignUp = async () => {
+    await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${location.origin}/auth/callback`,
+      },
+    })
+    router.refresh()
+    router.push('/')
+  }
+
+  const handleSignIn = async () => {
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    router.refresh()
+    router.push('/')
+}
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.refresh()
+}
+
+  const loginWithGoogle = async () =>{
+      await supabase.auth.signInWithOAuth(
+      { provider: 'google' })
+}
 
   return (
 
