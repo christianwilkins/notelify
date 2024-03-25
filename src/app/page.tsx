@@ -50,7 +50,6 @@ export default function Home() {
               marginBottom: "20px",
             }}
           >
-            GPT Finds Title
           </h1>
         </div>
         <div>
