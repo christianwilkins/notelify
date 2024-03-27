@@ -73,7 +73,8 @@ class BackendAudioAPI {
         const assistantResponse = await openai.beta.assistants.create({
             name: "Professional Notetaker",
             instructions: prompt,
-            model: "gpt-3.5-turbo-0125",
+            // model: "gpt-3.5-turbo-0125",
+            model: "gpt-3.5-turbo",
             tools: [{
                 "type": "function",
                 "function": {    
@@ -142,52 +143,29 @@ class BackendAudioAPI {
             const threadId = thread.id;
 
             // Create a message.
-            await openai.beta.threads.messages.create(threadId, {
+            const msg = await openai.beta.threads.messages.create(threadId, {
                 role: "user",
                 content: `${text}`,
             });
-            // console.log("Message created>>>>>>", `Summarize the following text in markdown format:\n\n${text}`);
-            // await openai.beta.threads.messages.create(threadId, {
-            //     role: "user",
-            //     content: "Get a title of the text in markdown format:\n\n${text}",
-            // });
+            console.log("Message created>>>>>>", `Summarize the following text in markdown format:\n\n${text}`);
 
             // Run the assistant.
-            const run = await openai.beta.threads.runs.createAndStream(threadId, {
-                assistant_id: this.assistant_id,
-            }).on('textCreated', async (text) => {
-                try {
-                    await this.delay(1000);
-                    console.dir(text, { depth: null })
-                    props.editorRef.current?.setContent(text);
-                    const data = JSON.parse(text.value);
-                    const textToAppend = data.markdown_summary;
-                    
-                    props.editorRef.current?.setContent(textToAppend);
-                } catch (error) {
-                    console.error('Error processing the text:', error);
-                }
+            const run = await openai.beta.threads.runs.createAndStream(
+                threadId, {
+                assistant_id: this.assistant_id, stream:true
             });
-        // }).on('toolCallDelta', (toolCallDelta, snapshot) => {
-        //     if (toolCallDelta.type === 'code_interpreter') {
-        //         if (toolCallDelta.code_interpreter.input) {
-        //         process.stdout.write(toolCallDelta.code_interpreter.input);
-        //         }
-        //         if (toolCallDelta.code_interpreter.outputs) {
-        //         process.stdout.write("\noutput >\n");
-        //         toolCallDelta.code_interpreter.outputs.forEach(output => {
-        //             if (output.type === "logs") {
-        //             process.stdout.write(`\n${output.logs}\n`);
-        //             }
-        //         });
-        //         }
-        //     }
-        // });
-
-                        
-            console.log(run);
-            // markdownSummary = run.choices[0].text.trim();
-            // markdownSummary = response.choices[0].text.trim();
+            const stream = run.toReadableStream();
+            console.log("stream here", stream)
+            props.editorRef.current?.setContent(stream);
+            const reader = stream.getReader();
+            let chunks = '';
+            let result = await reader.read();
+            while (!result.done) {
+                chunks += new TextDecoder("utf-8").decode(result.value);
+                result = await reader.read();
+            }
+            console.log(chunks);
+            return chunks;
         } catch (err) {
             console.error(err);
         }
