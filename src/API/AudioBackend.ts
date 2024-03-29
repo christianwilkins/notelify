@@ -92,9 +92,9 @@ class BackendAudioAPI {
                         "required": [
                             "userid",
                             "title",
+                            "sections",
                             "content",
-                            "transcribed_text",
-                            "sections"
+                            "transcribed_text"
                         ],    
                         "properties": {
                             "userid": {
@@ -104,14 +104,6 @@ class BackendAudioAPI {
                             "title": {
                                 "type": "string",
                                 "description": "The title of the entire conversation"
-                            },
-                            "content": {
-                                "type": "string",
-                                "description": "The full summary of the conversation in markdown format",
-                            },
-                            "transcribed_text": {
-                                "type": "string",
-                                "description": "The transcribed text of the conversation"
                             },
                             "sections": { 
                                 "type": "array",
@@ -131,7 +123,14 @@ class BackendAudioAPI {
                                     }
                                 }
                             },
-    
+                            "content": {
+                                "type": "string",
+                                "description": "The full summary of the conversation in markdown format",
+                            },
+                            "transcribed_text": {
+                                "type": "string",
+                                "description": "The transcribed text of the conversation"
+                            },
                         },
                     }
                 }
