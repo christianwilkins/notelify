@@ -133,9 +133,9 @@ const CaptureAudioGeneric = (
                         let micText = "\n The following text is from the user speaker: \n" + transcriptionTextMic + "\n";
                         let desktopText = "\n The following text is from the other speaker: \n" + transcriptionTextDesktop + "\n";
                         overallTranscription = micText + desktopText;
-                        
                         // Summarizing the transcribed text
-                        audioBackend.summarize(overallTranscription, props);
+                        const newText = audioBackend.textChanged(overallTranscription)
+                        audioBackend.summarize(await newText, props);
                     }
                     
                 }
@@ -145,7 +145,7 @@ const CaptureAudioGeneric = (
                 console.log(err)
             }
         };
-
+        
         const stopAudio = () => {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();

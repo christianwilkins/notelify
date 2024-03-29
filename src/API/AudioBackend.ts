@@ -7,6 +7,12 @@ Whisper API. And, it also provides a method to summarize that transcribed string
 import OpenAI from "openai";
 import * as dotenv from "dotenv";
 import hark from "hark";
+import { ReadableStream } from 'web-streams-polyfill/ponyfill/es2018';
+import { EventEmitter } from 'events';
+import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
+import { response } from "express";
+import { json } from "stream/consumers";
+import { startupSnapshot } from "v8";
 
 // Set up environment variables
 dotenv.config();
@@ -34,13 +40,12 @@ lecture. You also do not know the future of what is going to be said so you need
 the most important points as they come. This is a very important skill to have.
     
 You should also be able to tell when the speaker is talking about a new topic or a new idea.
-to best organize your notes you should organzie them by topic and subtopics.
+to best organize your notes you should organize them by topic and subtopics.
 
 You will be given pieces of the transcribed lecture/conversation and you need to find the noteworthy points as they come in.
 
 As a professional note-taker, you need to be able to quickly and efficiently summarize the main points of a conversation. However, you
 also will need to format the response correctly. 
-
 
 Convert transcribed text into key points and main ideas using Markdown, which splits 
 words and text into headers/headings, bullet points, bolding, italics, underlines, etc. 
@@ -51,7 +56,7 @@ important information to take out from the provided conversation using a traditi
 Create it as if you were writing detailed notes with important examples. Do not miss out on 
 information. Ensure the generated text includes relevant details about the topic discussed. 
 Please additionally add a summary at the end or a conclusion. Adapt the response to the context 
-of the conversation, including concepts, examples, and any recommended style guide. The output should be inside the markdown_summary key.
+of the conversation, including concepts, examples, and any recommended style guide. PLACE THIS OUTPUT IN THE content key.
 
 VERY IMPORTANT: The transcribed text may be formatted in this way: "The following text is from the 
 user speaker: [transcribed text]" or "The following text is from the other speaker: [transcribed text]".
@@ -64,6 +69,8 @@ different things, avoid saying things like "speaker 1 said this" or "other speak
 try to weave them together as naturally as possible. You can do it but just try to minimize it as much as possible. And,
 do NOT use the sentence "The following text is from the user speaker" or "The following text is from the other speaker".
 `;
+
+let previousText = "";
 
 class BackendAudioAPI {
     assistant_id: any;
@@ -87,6 +94,7 @@ class BackendAudioAPI {
                             "title",
                             "content",
                             "transcribed_text",
+                            "sections"
                         ],    
                         "properties": {
                             "userid": {
@@ -95,11 +103,11 @@ class BackendAudioAPI {
                             },
                             "title": {
                                 "type": "string",
-                                "description": "The title of the conversation"
+                                "description": "The title of the entire conversation"
                             },
                             "content": {
                                 "type": "string",
-                                "description": "The summary of the conversation in markdown format",
+                                "description": "The full summary of the conversation in markdown format",
                             },
                             "transcribed_text": {
                                 "type": "string",
@@ -114,11 +122,11 @@ class BackendAudioAPI {
                                     "properties": {
                                         "section-title": {
                                             "type": "string",
-                                            "description": "The title of the section"
+                                            "description": "The title of the specific conversation"
                                         },
                                         "section-content": {
                                             "type": "string",
-                                            "description": "The content of the section"
+                                            "description": "The summary of the conversation in markdown format"
                                         }
                                     }
                                 }
@@ -153,15 +161,44 @@ class BackendAudioAPI {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
-    async summarize(text: string, props: any): Promise<string> {
+    // This method is relies on the fact that everything is added to the end of whisper. Uses LCS.
+    async textChanged(newText: string): Promise<string> {
+        if (previousText === newText) {
+            return "";
+        }
+    
+        let index = -1;
+        // Find the index where new unique text starts in the newText by comparing it from the end
+        for (let i = 0; i < previousText.length && i < newText.length; i++) {
+            if (newText[i] !== previousText[i]) {
+                index = i;
+                break;
+            }
+        }
+    
+        let actualNewText = "";
+        if (index !== -1) {
+            actualNewText = newText.substring(index);
+        } else {
+            actualNewText = newText;
+        }
+    
+        // Update previousText with the current newText for the next call
+        previousText = newText;
+    
+        return actualNewText;    
+    }
+    
+    async summarize(text: string, props: any): Promise<void>{
+        // Any changes in txt should be sent to text
+        // Our own method for streaming openai assistant if i cant get it to work with textdelta
+        // I need to get sections and section-content, section-title working
         console.log(`Transcribed Text: ${text}`);
         let markdownSummary = "";
 
 
         try {
-            
-
-            // Create a thread.
+            // Create a thread with an id.
             const thread = await openai.beta.threads.create();
             const threadId = thread.id;
 
@@ -170,25 +207,73 @@ class BackendAudioAPI {
                 role: "user",
                 content: `${text}`,
             });
-            console.log("Message created>>>>>>", `Summarize the following text in markdown format:\n\n${text}`);
+
+            // To ensure textDelta works correctly.
+            let additionalCallsCount = 0;
+            let waitMoreCalls = false; 
+
+            if (props.editorRef.current === "Notes will be generated here...") {
+                props.editorRef.current?.setContent("");
+            }
 
             // Run the assistant.
-            const run = await openai.beta.threads.runs.createAndStream(
-                threadId, {
-                assistant_id: this.assistant_id, stream:true
+            const run = openai.beta.threads.runs.createAndStream(
+                threadId,
+                {
+                    assistant_id: this.assistant_id,
+                    stream: true
+                }
+            ).on("event", (evt: any) => {
+                // This event is an example to get JSON output from the assistant. It will be useful to get user_id, title, content, and transcribed_text.
+                if (evt.event === "thread.run.requires_action") {
+                    const jsonText = evt.data.required_action?.submit_tool_outputs.tool_calls[0].function.arguments;
+                    if (jsonText) {
+                        try {
+                            const parsedJson = JSON.parse(jsonText);
+                            console.log(parsedJson);
+                            for (let i = 0; i < parsedJson.sections.length; ++i) {
+                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-title"]);
+                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-content"]);
+                            }
+                        }
+                        catch (err) {
+                            console.log("Waiting for section-title/section-content", err);
+                        }
+                    }
+                }
             });
-            const stream = run.toReadableStream();
-            console.log("stream here", stream)
-            props.editorRef.current?.setContent(stream);
-            const reader = stream.getReader();
-            let chunks = '';
-            let result = await reader.read();
-            while (!result.done) {
-                chunks += new TextDecoder("utf-8").decode(result.value);
-                result = await reader.read();
-            }
-            console.log(chunks);
-            return chunks;
+            // ).on('toolCallDelta', (toolCallDelta: any, snapshot: any) => {
+            
+            //     if (waitMoreCalls) {
+            //         additionalCallsCount++;
+            //     }
+            
+            //     console.log('toolCallDelta:', toolCallDelta);
+            //     if (toolCallDelta.type === 'function') {
+                    
+            //         if (toolCallDelta.function.arguments == "section-content") {
+            //             waitMoreCalls = true; // In he right spot
+            //         }
+            //         if (waitMoreCalls && toolCallDelta.function.arguments != "transcribed_text" && toolCallDelta.function.arguments != "-") {
+            //             console.log(toolCallDelta.function.arguments);
+            //             props.editorRef.current?.appendContent(toolCallDelta.function.arguments);
+            //         }
+            //     }
+            // });
+
+            // const stream = run.toReadableStream();
+
+            // console.log("stream here", stream)
+            // props.editorRef.current?.setContent(stream);
+            // const reader = stream.getReader();
+            //     let chunks = '';
+            //     let result = await reader.read();
+            // while (!result.done) {
+            //     chunks += new TextDecoder("utf-8").decode(result.value);
+            //     result = await reader.read();
+            // }
+            // console.log(chunks);
+            // return chunks;
         } catch (err) {
             console.error(err);
         }
