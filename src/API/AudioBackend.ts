@@ -99,8 +99,31 @@ class BackendAudioAPI {
                             },
                             "content": {
                                 "type": "string",
-                                "description": "The summary of the conversation in markdown format"
+                                "description": "The summary of the conversation in markdown format",
                             },
+                            "transcribed_text": {
+                                "type": "string",
+                                "description": "The transcribed text of the conversation"
+                            },
+                            "sections": { 
+                                "type": "array",
+                                "description": "The sections of the conversation",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["section-title", "section-content"],
+                                    "properties": {
+                                        "section-title": {
+                                            "type": "string",
+                                            "description": "The title of the section"
+                                        },
+                                        "section-content": {
+                                            "type": "string",
+                                            "description": "The content of the section"
+                                        }
+                                    }
+                                }
+                            },
+    
                         },
                     }
                 }
