@@ -85,7 +85,7 @@ const CaptureAudioGeneric = (
                     transcriptionText = transcriptionTextMic;
                     transcriptionIteration = transcriptionIterationMic;
                 }
-    
+                
                 const recorder = new MediaRecorder(mediaStream);
                 setMediaRecorder(recorder);
     
@@ -102,9 +102,11 @@ const CaptureAudioGeneric = (
 
                     // Checking if the user is speaking
                     let speaking = await audioBackend.isSpeaking(mediaStream);
-
+                    
+                
                     // Only if the user is speaking will we want to transcribe and summarize the audio
                     if (speaking) {
+                        audioBackend.initAssistant();
                         // Transcribing the audio
                         if (transcriptionIteration === 0) {
                             // If we have just started the transcription, we want to store the first string separately
@@ -131,13 +133,9 @@ const CaptureAudioGeneric = (
                         let micText = "\n The following text is from the user speaker: \n" + transcriptionTextMic + "\n";
                         let desktopText = "\n The following text is from the other speaker: \n" + transcriptionTextDesktop + "\n";
                         overallTranscription = micText + desktopText;
-
                         // Summarizing the transcribed text
-                        audioBackend.summarize(overallTranscription).then(summary => {
-
-                            // and displaying it directly into the editor
-                            props.editorRef.current.setContent(summary);
-                        })
+                        const newText = audioBackend.textChanged(overallTranscription)
+                        audioBackend.summarize(await newText, props);
                     }
                     
                 }
@@ -147,7 +145,7 @@ const CaptureAudioGeneric = (
                 console.log(err)
             }
         };
-
+        
         const stopAudio = () => {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
