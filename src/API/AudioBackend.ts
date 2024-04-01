@@ -193,6 +193,11 @@ class BackendAudioAPI {
         // Our own method for streaming openai assistant if i cant get it to work with textdelta
         // I need to get sections and section-content, section-title working
         console.log(`Transcribed Text: ${text}`);
+        if (text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:")) {
+            console.log("Skipping text processing due to template markers.");
+            return; // Early return to avoid processing this text
+        }
+    
         let markdownSummary = "";
 
 

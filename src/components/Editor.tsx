@@ -11,6 +11,8 @@ import Link from '@tiptap/extension-link'
 export interface ModifiedEditorHandle {
   setContent: (content: string) => void;
   appendContent: (content: string) => void;
+  clearContent: () => void;
+  getHTML: () => string | undefined;
 }
 
 const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
@@ -63,6 +65,12 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
         }
       }
     },
+    clearContent: () => {
+      editor?.commands.setContent("");
+    },
+    getHTML: () => {
+      return editor?.getHTML(); // Add this line to expose getHTML
+    },  
   }));
 
   useEffect(() => {
