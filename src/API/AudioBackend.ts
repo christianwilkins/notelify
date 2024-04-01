@@ -235,7 +235,7 @@ class BackendAudioAPI {
                             console.log(parsedJson);
                             for (let i = 0; i < parsedJson.sections.length; ++i) {
                                 props.editorRef.current?.appendContent(parsedJson.sections[i]["section-title"]);
-                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-content"]);
+                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-content"], 2);
                             }
                         }
                         catch (err) {
