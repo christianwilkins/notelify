@@ -197,10 +197,12 @@ class BackendAudioAPI {
             console.log("Skipping text processing due to template markers.");
             return; // Early return to avoid processing this text
         }
-    
-        let markdownSummary = "";
-
-
+        
+        if (props.editorRef.current?.getHTML() === "<p>Notes will be generated here...</p>") {
+            props.editorRef.current?.clearContent();
+        }
+          
+        
         try {
             // Create a thread with an id.
             const thread = await openai.beta.threads.create();
@@ -215,10 +217,6 @@ class BackendAudioAPI {
             // To ensure textDelta works correctly.
             let additionalCallsCount = 0;
             let waitMoreCalls = false; 
-
-            if (props.editorRef.current === "Notes will be generated here...") {
-                props.editorRef.current?.setContent("");
-            }
 
             // Run the assistant.
             const run = openai.beta.threads.runs.createAndStream(
