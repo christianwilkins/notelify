@@ -17,6 +17,8 @@ import { startupSnapshot } from "v8";
 // Set up environment variables
 dotenv.config();
 
+
+
 // Setting up OpenAI
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -188,7 +190,7 @@ class BackendAudioAPI {
         return actualNewText;    
     }
     
-    async summarize(text: string, props: any): Promise<void>{
+    async summarize(text: string, props: any, supabaseInstance: any, currNoteId: number): Promise<void>{
         // Any changes in txt should be sent to text
         // Our own method for streaming openai assistant if i cant get it to work with textdelta
         // I need to get sections and section-content, section-title working
@@ -222,7 +224,7 @@ class BackendAudioAPI {
                     assistant_id: this.assistant_id,
                     stream: true
                 }
-            ).on("event", (evt: any) => {
+            ).on("event", async (evt: any) => {
                 // This event is an example to get JSON output from the assistant. It will be useful to get user_id, title, content, and transcribed_text.
                 if (evt.event === "thread.run.requires_action") {
                     const jsonText = evt.data.required_action?.submit_tool_outputs.tool_calls[0].function.arguments;
@@ -231,8 +233,21 @@ class BackendAudioAPI {
                             const parsedJson = JSON.parse(jsonText);
                             console.log(parsedJson);
                             for (let i = 0; i < parsedJson.sections.length; ++i) {
-                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-title"]);
-                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-content"]);
+                                let title = parsedJson.sections[i]["section-title"];
+                                let content = parsedJson.sections[i]["section-content"];
+                                props.editorRef.current?.appendContent(title);
+                                props.editorRef.current?.appendContent(content);
+
+                                // Insert this section into the database
+                                const { errror } = await supabaseInstance
+                                    .from("sections")
+                                    .insert([
+                                        {
+                                            section_title: title,
+                                            section_content: content,
+                                            parent_note_id: currNoteId
+                                        }
+                                    ])
                             }
                         }
                         catch (err) {
