@@ -4,6 +4,7 @@ import { MicAudioButton, DesktopAudioButton } from "@/components/GetUserAudio";
 import SideBar from "@/components/SideBar";
 import React, { useEffect, useRef, useState } from "react";
 import ModifiedEditor, { ModifiedEditorHandle } from "@/components/Editor";
+import searchNotes from "@/API/SearchNotes";
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
@@ -12,6 +13,19 @@ export default function Home() {
 
   const editorRef = useRef<ModifiedEditorHandle>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = async (event: React.FormEvent) => {
+    event.preventDefault();
+  
+    // Make a GET request to the /api/search endpoint with searchQuery as a query parameter
+    const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
+    
+    // Parse the JSON response
+    const results = await response.json();
+  
+    console.log(results);
+  };
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -41,6 +55,15 @@ export default function Home() {
       <SideBar></SideBar>
       <main className="flex flex-col items-center justify-between p-24">
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
+       
+        <form onSubmit={handleSearch}>
+          <label>
+            Search Notes:
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+          </label>
+          <input type="submit" value="Search" />
+        </form>
+
 
         <div>
           <h1
