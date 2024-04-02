@@ -17,6 +17,8 @@
 
 import { useState } from 'react';
 import BackendAudioAPI from '@/API/AudioBackend';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
 
 // Initializing the Backend Audio Services
 let audioBackend = new BackendAudioAPI();
@@ -31,6 +33,10 @@ let transcriptionTextDesktop: string = "";
 let transcriptionIterationDesktop: number = 0;
 
 let overallTranscription: string = "";
+
+let currNoteId: number;
+
+const supabase = createClientComponentClient();
 
 const CaptureAudioGeneric = (
     /**
@@ -54,6 +60,31 @@ const CaptureAudioGeneric = (
         let chunks: BlobPart[] = [];
 
         const captureAudio = async () => {
+            try {
+                // Insert a new entry into the "notes" table
+                console.log((await supabase.auth.getUser()).data.user?.email)
+
+                const { data, error } = await supabase
+                    .from('notes')
+                    .insert([{
+                        /* Every attribute for a note object is created automatically by the database
+                        Hence, do NOT edit this object */
+                    }])
+                    .select();
+        
+                if (error) {
+                    console.error('Error inserting note:', error);
+                } else {
+                    console.log('Note inserted successfully:', data);
+                    // After inserting the note, we want to get the ID of the note that was just inserted
+                    currNoteId = data[0].id;
+                }
+        
+            } 
+            catch (err) {
+                console.log(err)
+            }
+
             try {
                 const mediaStream = await getMediaStream();
                 setMediaStream(mediaStream);
@@ -135,7 +166,7 @@ const CaptureAudioGeneric = (
                         overallTranscription = micText + desktopText;
                         // Summarizing the transcribed text
                         const newText = audioBackend.textChanged(overallTranscription)
-                        audioBackend.summarize(await newText, props);
+                        audioBackend.summarize(await newText, props, supabase, currNoteId);
                     }
                     
                 }
@@ -146,7 +177,7 @@ const CaptureAudioGeneric = (
             }
         };
         
-        const stopAudio = () => {
+        const stopAudio = async () => {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.stop();
                 console.log("should stop");
@@ -156,7 +187,16 @@ const CaptureAudioGeneric = (
                 mediaStream.getTracks().forEach(track => track.stop());
             }
         
-            console.log("SHOULD STOP");
+            const { data, error } = await supabase
+                .from('sections')
+                .select('*')
+                .eq('parent_note_id', currNoteId);
+    
+            if (error) {
+                console.error('Error fetching notes:', error);
+            } else {
+                console.log('Fetched notes:', data);
+            }
         }
 
         return (
