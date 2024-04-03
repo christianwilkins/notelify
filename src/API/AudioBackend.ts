@@ -190,14 +190,60 @@ class BackendAudioAPI {
         return actualNewText;    
     }
     
-    async summarize(text: string, props: any, supabaseInstance: any, currNoteId: number): Promise<void>{
-        // Any changes in txt should be sent to text
-        // Our own method for streaming openai assistant if i cant get it to work with textdelta
-        // I need to get sections and section-content, section-title working
+
+    async processSectionTitle(text: string, props: any): Promise<void> {    
+        // Split the text into lines
+        const lines = text.split('\n');
+    
+        const processLineWithDelay = (line: string, delay: number) => {
+            return new Promise(resolve => setTimeout(() => {
+                props.editorRef.current?.appendContent(line);
+
+                console.log(line); // Replace this with the actual code to append the line to the editor
+                resolve(line); // Resolve the promise once the line is processed
+            }, delay));
+        };
+    
+        // Process each line with a random delay between 10ms and 100ms
+        for (const line of lines) {
+            const delay = Math.random() * (100 - 10) + 10; 
+            await processLineWithDelay(line, delay);
+        }
+    }
+
+
+    async processTextToAppend(text: string, props: any): Promise<void> {
+        const lines = text.split('\n');
+    
+        const processLineWithDelay = (line: string, delay: number) => {
+            return new Promise(resolve => setTimeout(() => {
+                props.editorRef.current?.appendContent(line, 2);
+
+                resolve(line); 
+            }, delay));
+        };
+    
+        for (const line of lines) {
+            const delay = Math.random() * (100 - 10) + 10; 
+            await processLineWithDelay(line, delay);
+        }
+    }
+    
+    async summarize(text: string, props: any): Promise<void>{
         console.log(`Transcribed Text: ${text}`);
-        let markdownSummary = "";
 
-
+        const isTextValid = text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:");
+        const isEmpty = text.trim() === "";
+        if (isTextValid || isEmpty) {
+            console.log("Skipping text.");
+            return; // Early return to avoid processing this text
+        }
+        
+        if (props.editorRef.current?.getHTML() === "<p>Notes will be generated here...</p>") {
+            props.editorRef.current?.clearContent();
+        }
+          
+        
         try {
             // Create a thread with an id.
             const thread = await openai.beta.threads.create();
@@ -212,10 +258,6 @@ class BackendAudioAPI {
             // To ensure textDelta works correctly.
             let additionalCallsCount = 0;
             let waitMoreCalls = false; 
-
-            if (props.editorRef.current === "Notes will be generated here...") {
-                props.editorRef.current?.setContent("");
-            }
 
             // Run the assistant.
             const run = openai.beta.threads.runs.createAndStream(

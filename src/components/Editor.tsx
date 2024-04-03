@@ -10,7 +10,9 @@ import Link from '@tiptap/extension-link'
 
 export interface ModifiedEditorHandle {
   setContent: (content: string) => void;
-  appendContent: (content: string) => void;
+  appendContent: (content: string, linebreakCount?: number) => void;
+  clearContent: () => void;
+  getHTML: () => string | undefined;
 }
 
 const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
@@ -54,15 +56,26 @@ const TiptapEditor = forwardRef<ModifiedEditorHandle>((props, ref) => {
     setContent: (content: string) => {
       editor?.commands.setContent(content);
     },
-    appendContent: (content: string) => {
+    appendContent: (content: string, linebreakCount: number = 0) => {
       if (editor) {
+        editor.commands.focus('end')
         if (!editor.isEmpty) {
-          editor.chain().focus().insertContent(content).run();
+          editor.chain().insertContent(content).run();    
+          for (let i = 0; i < linebreakCount; i++) {
+            editor.commands.enter();
+          }  
         } else {
+          editor.chain().insertContent("\n").run();
           editor.commands.setContent(content);
         }
       }
     },
+    clearContent: () => {
+      editor?.commands.setContent("");
+    },
+    getHTML: () => {
+      return editor?.getHTML(); // Add this line to expose getHTML
+    },  
   }));
 
   useEffect(() => {

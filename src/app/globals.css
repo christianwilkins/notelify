@@ -183,3 +183,6 @@
   box-sizing: border-box; 
 }
 
+.ProseMirror:focus {
+    outline: none;
+}
