@@ -188,13 +188,52 @@ class BackendAudioAPI {
         return actualNewText;    
     }
     
+
+    async processSectionTitle(text: string, props: any): Promise<void> {    
+        // Split the text into lines
+        const lines = text.split('\n');
+    
+        const processLineWithDelay = (line: string, delay: number) => {
+            return new Promise(resolve => setTimeout(() => {
+                props.editorRef.current?.appendContent(line);
+
+                console.log(line); // Replace this with the actual code to append the line to the editor
+                resolve(line); // Resolve the promise once the line is processed
+            }, delay));
+        };
+    
+        // Process each line with a random delay between 10ms and 100ms
+        for (const line of lines) {
+            const delay = Math.random() * (100 - 10) + 10; 
+            await processLineWithDelay(line, delay);
+        }
+    }
+
+
+    async processTextToAppend(text: string, props: any): Promise<void> {
+        const lines = text.split('\n');
+    
+        const processLineWithDelay = (line: string, delay: number) => {
+            return new Promise(resolve => setTimeout(() => {
+                props.editorRef.current?.appendContent(line, 2);
+
+                resolve(line); 
+            }, delay));
+        };
+    
+        for (const line of lines) {
+            const delay = Math.random() * (100 - 10) + 10; 
+            await processLineWithDelay(line, delay);
+        }
+    }
+    
     async summarize(text: string, props: any): Promise<void>{
-        // Any changes in txt should be sent to text
-        // Our own method for streaming openai assistant if i cant get it to work with textdelta
-        // I need to get sections and section-content, section-title working
         console.log(`Transcribed Text: ${text}`);
-        if (text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:")) {
-            console.log("Skipping text processing due to template markers.");
+
+        const isTextValid = text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:");
+        const isEmpty = text.trim() === "";
+        if (isTextValid || isEmpty) {
+            console.log("Skipping text.");
             return; // Early return to avoid processing this text
         }
         
@@ -225,7 +264,7 @@ class BackendAudioAPI {
                     assistant_id: this.assistant_id,
                     stream: true
                 }
-            ).on("event", (evt: any) => {
+            ).on("event", async (evt: any) => {
                 // This event is an example to get JSON output from the assistant. It will be useful to get user_id, title, content, and transcribed_text.
                 if (evt.event === "thread.run.requires_action") {
                     const jsonText = evt.data.required_action?.submit_tool_outputs.tool_calls[0].function.arguments;
@@ -233,9 +272,13 @@ class BackendAudioAPI {
                         try {
                             const parsedJson = JSON.parse(jsonText);
                             console.log(parsedJson);
-                            for (let i = 0; i < parsedJson.sections.length; ++i) {
-                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-title"]);
-                                props.editorRef.current?.appendContent(parsedJson.sections[i]["section-content"], 2);
+                            for (const section of parsedJson.sections) {
+                                if (section["section-title"]) {
+                                    await this.processSectionTitle(section["section-title"], props);
+                                }
+                                if (section["section-content"]) {
+                                    await this.processTextToAppend(section["section-content"], props);
+                                }
                             }
                         }
                         catch (err) {
