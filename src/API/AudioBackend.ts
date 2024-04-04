@@ -191,51 +191,37 @@ class BackendAudioAPI {
     }
     
 
-    async processSectionTitle(text: string, props: any): Promise<void> {    
-        // Split the text into lines
+    async processTextWithDelay(text: string, props: any, lineBreaks?: number): Promise<void> {
         const lines = text.split('\n');
     
         const processLineWithDelay = (line: string, delay: number) => {
             return new Promise(resolve => setTimeout(() => {
-                props.editorRef.current?.appendContent(line);
-
-                console.log(line); // Replace this with the actual code to append the line to the editor
-                resolve(line); // Resolve the promise once the line is processed
+                // Check if lineBreaks are provided, else default to using appendContent without it.
+                if (lineBreaks !== undefined) {
+                    props.editorRef.current?.appendContent(line, lineBreaks);
+                } else {
+                    props.editorRef.current?.appendContent(line);
+                }
+    
+                console.log(line); // Log the line to the console for debugging
+                resolve(line);
             }, delay));
         };
     
         // Process each line with a random delay between 10ms and 100ms
         for (const line of lines) {
-            const delay = Math.random() * (100 - 10) + 10; 
-            await processLineWithDelay(line, delay);
-        }
-    }
-
-
-    async processTextToAppend(text: string, props: any): Promise<void> {
-        const lines = text.split('\n');
-    
-        const processLineWithDelay = (line: string, delay: number) => {
-            return new Promise(resolve => setTimeout(() => {
-                props.editorRef.current?.appendContent(line, 2);
-
-                resolve(line); 
-            }, delay));
-        };
-    
-        for (const line of lines) {
-            const delay = Math.random() * (100 - 10) + 10; 
+            const delay = Math.random() * (100 - 10) + 10;
             await processLineWithDelay(line, delay);
         }
     }
     
-    async summarize(text: string, props: any): Promise<void>{
+    
+    async summarize(text: string, props: any, supabaseInstance: any, currNoteId: number): Promise<void>{
         console.log(`Transcribed Text: ${text}`);
 
         const isTextValid = text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:");
         const isEmpty = text.trim() === "";
         if (isTextValid || isEmpty) {
-            console.log("Skipping text.");
             return; // Early return to avoid processing this text
         }
         
@@ -277,8 +263,9 @@ class BackendAudioAPI {
                             for (let i = 0; i < parsedJson.sections.length; ++i) {
                                 let title = parsedJson.sections[i]["section-title"];
                                 let content = parsedJson.sections[i]["section-content"];
-                                props.editorRef.current?.appendContent(title);
-                                props.editorRef.current?.appendContent(content);
+
+                                await this.processTextWithDelay(title, props);
+                                await this.processTextWithDelay(content, props, 2);
 
                                 // Insert this section into the database
                                 const { errror } = await supabaseInstance
@@ -317,29 +304,9 @@ class BackendAudioAPI {
             //     }
             // });
 
-            // const stream = run.toReadableStream();
-
-            // console.log("stream here", stream)
-            // props.editorRef.current?.setContent(stream);
-            // const reader = stream.getReader();
-            //     let chunks = '';
-            //     let result = await reader.read();
-            // while (!result.done) {
-            //     chunks += new TextDecoder("utf-8").decode(result.value);
-            //     result = await reader.read();
-            // }
-            // console.log(chunks);
-            // return chunks;
         } catch (err) {
             console.error(err);
         }
-        
-        // return JSON.stringify({
-        //     // title_text: title,
-        //     transcribed_text: text,
-        //     markdown_summary: markdownSummary,
-        //     new_content_index: newContentIndex
-        // });
     }
 
     async isSpeaking(mediaStream: MediaStream): Promise<boolean> {
