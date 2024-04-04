@@ -88,7 +88,7 @@ class BackendAudioAPI {
                 "type": "function",
                 "function": {    
                     "name": "response",
-                    "description": "Note-taking with title and markdown summary",
+                    "description": "Note-taking with title and various markdown styles in a summary",
                     "parameters": {
                         "type": "object",
                         "required": [
@@ -120,7 +120,7 @@ class BackendAudioAPI {
                                         },
                                         "section-content": {
                                             "type": "string",
-                                            "description": "The summary of the conversation in markdown format"
+                                            "description": "The summary of the conversation with various styles from a markdown style in markdown format."
                                         }
                                     }
                                 }
@@ -264,7 +264,7 @@ class BackendAudioAPI {
                                 let title = parsedJson.sections[i]["section-title"];
                                 let content = parsedJson.sections[i]["section-content"];
 
-                                await this.processTextWithDelay(title, props);
+                                await this.processTextWithDelay("## " + title, props);
                                 await this.processTextWithDelay(content, props, 2);
 
                                 // Insert this section into the database
