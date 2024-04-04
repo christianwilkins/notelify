@@ -88,7 +88,7 @@ class BackendAudioAPI {
                 "type": "function",
                 "function": {    
                     "name": "response",
-                    "description": "Note-taking with title and markdown summary",
+                    "description": "Note-taking with title and various markdown styles in a summary",
                     "parameters": {
                         "type": "object",
                         "required": [
@@ -120,7 +120,7 @@ class BackendAudioAPI {
                                         },
                                         "section-content": {
                                             "type": "string",
-                                            "description": "The summary of the conversation in markdown format"
+                                            "description": "The summary of the conversation with various styles from a markdown style in markdown format."
                                         }
                                     }
                                 }
@@ -190,14 +190,46 @@ class BackendAudioAPI {
         return actualNewText;    
     }
     
+
+    async processTextWithDelay(text: string, props: any, lineBreaks?: number): Promise<void> {
+        const lines = text.split('\n');
+    
+        const processLineWithDelay = (line: string, delay: number) => {
+            return new Promise(resolve => setTimeout(() => {
+                // Check if lineBreaks are provided, else default to using appendContent without it.
+                if (lineBreaks !== undefined) {
+                    props.editorRef.current?.appendContent(line, lineBreaks);
+                } else {
+                    props.editorRef.current?.appendContent(line);
+                }
+    
+                console.log(line); // Log the line to the console for debugging
+                resolve(line);
+            }, delay));
+        };
+    
+        // Process each line with a random delay between 10ms and 100ms
+        for (const line of lines) {
+            const delay = Math.random() * (100 - 10) + 10;
+            await processLineWithDelay(line, delay);
+        }
+    }
+    
+    
     async summarize(text: string, props: any, supabaseInstance: any, currNoteId: number): Promise<void>{
-        // Any changes in txt should be sent to text
-        // Our own method for streaming openai assistant if i cant get it to work with textdelta
-        // I need to get sections and section-content, section-title working
         console.log(`Transcribed Text: ${text}`);
-        let markdownSummary = "";
 
-
+        const isTextValid = text.includes("The following text is from the user speaker:") && text.includes("The following text is from the other speaker:");
+        const isEmpty = text.trim() === "";
+        if (isTextValid || isEmpty) {
+            return; // Early return to avoid processing this text
+        }
+        
+        if (props.editorRef.current?.getHTML() === "<p>Notes will be generated here...</p>") {
+            props.editorRef.current?.clearContent();
+        }
+          
+        
         try {
             // Create a thread with an id.
             const thread = await openai.beta.threads.create();
@@ -212,10 +244,6 @@ class BackendAudioAPI {
             // To ensure textDelta works correctly.
             let additionalCallsCount = 0;
             let waitMoreCalls = false; 
-
-            if (props.editorRef.current === "Notes will be generated here...") {
-                props.editorRef.current?.setContent("");
-            }
 
             // Run the assistant.
             const run = openai.beta.threads.runs.createAndStream(
@@ -235,8 +263,9 @@ class BackendAudioAPI {
                             for (let i = 0; i < parsedJson.sections.length; ++i) {
                                 let title = parsedJson.sections[i]["section-title"];
                                 let content = parsedJson.sections[i]["section-content"];
-                                props.editorRef.current?.appendContent(title);
-                                props.editorRef.current?.appendContent(content);
+
+                                await this.processTextWithDelay("## " + title, props);
+                                await this.processTextWithDelay(content, props, 2);
 
                                 // Insert this section into the database
                                 const { errror } = await supabaseInstance
@@ -275,29 +304,9 @@ class BackendAudioAPI {
             //     }
             // });
 
-            // const stream = run.toReadableStream();
-
-            // console.log("stream here", stream)
-            // props.editorRef.current?.setContent(stream);
-            // const reader = stream.getReader();
-            //     let chunks = '';
-            //     let result = await reader.read();
-            // while (!result.done) {
-            //     chunks += new TextDecoder("utf-8").decode(result.value);
-            //     result = await reader.read();
-            // }
-            // console.log(chunks);
-            // return chunks;
         } catch (err) {
             console.error(err);
         }
-        
-        // return JSON.stringify({
-        //     // title_text: title,
-        //     transcribed_text: text,
-        //     markdown_summary: markdownSummary,
-        //     new_content_index: newContentIndex
-        // });
     }
 
     async isSpeaking(mediaStream: MediaStream): Promise<boolean> {
