@@ -4,7 +4,7 @@ import { MicAudioButton, DesktopAudioButton } from "@/components/GetUserAudio";
 import SideBar from "@/components/SideBar";
 import React, { useEffect, useRef, useState } from "react";
 import ModifiedEditor, { ModifiedEditorHandle } from "@/components/Editor";
-import searchNotes from "@/API/SearchNotes";
+
 
 const bmcId = process.env.BMC_ID as string;
 //if (bmcId == "") throw new Error("Buy me a coffee key not found");
