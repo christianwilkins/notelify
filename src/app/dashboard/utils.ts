@@ -1,5 +1,14 @@
 
-export let data = {
+type DataType = {
+    [key: string]: {
+        cards: {
+            title: string;
+            description: string;
+        }[];
+    };
+};
+
+export let data: DataType = {
     "Yesterday": {
         "cards": [
             {"title": "Intro To Floating Point", "description": "We know how to convert this number into binary. Each binary digit is worth two to the I, where I is the digit number, starting at zero. So, seventeen is two to the fourth plus two to the zero; sixteen plus one."},
