@@ -37,7 +37,7 @@ export default function Home() {
       "data-message",
       "This website is free to use. Do you want to help support it?"
     );
-    script.setAttribute("data-color", "#FF5F5F");
+    script.setAttribute("data-color", "#2b2b2b");
     script.setAttribute("data-position", "right");
     script.setAttribute("data-x_margin", "18");
     script.setAttribute("data-y_margin", "18");
@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <>
       <SideBar></SideBar>
-      <main className="flex flex-col items-center justify-between p-24">
+      <main className="flex flex-col items-center justify-between pt-4 pl-24 pr-12">
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
 
         {/* <form onSubmit={handleSearch}>
@@ -74,12 +74,24 @@ export default function Home() {
           </h1>
         </div>
 
+        <div className="flex flex-row">
+          <div className="bg-transparent text-white w-full outline outline-2 rounded-full px-4 py-2 outline-[#505050]">
+            <div className="flex flex-row gap-2">
+              <img className="px-1" src="mic.svg" alt=""></img>
+              <img className="px-1" src="desktopAudio.svg" alt=""></img>
+              <img className="px-1" src="volume.svg" alt=""></img>
+              <img className="px-1" src="play.svg" alt=""></img>
+            </div>
+          </div>
+        </div>
+
         <div>
           <ModifiedEditor ref={editorRef}></ModifiedEditor>
         </div>
-        <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full"></button>
 
-        <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 p-2.5 rounded-full">
+        {/* <button className="fixed bottom-5 right-5 h-12 w-12 rounded-full"></button> */}
+
+        {/* <div className="bg-gray-200 fixed items-end flex h-1/32 w-1/4 left-100 top-5 p-2.5 rounded-full">
           <button
             className="absolute right-12 top-1 h-3 w-3 rounded-full bg-green-500"
           ></button>
@@ -89,7 +101,8 @@ export default function Home() {
           <button
             className="absolute right-2 top-1 h-3 w-3 rounded-full bg-red-500"
           ></button>
-        </div>
+        </div> */}
+
         <DesktopAudioButton editorRef={editorRef} />
         <MicAudioButton editorRef={editorRef} />
       </main>
