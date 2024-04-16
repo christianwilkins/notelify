@@ -17,13 +17,13 @@ export default function Home() {
 
   const handleSearch = async (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     // Make a GET request to the /api/search endpoint with searchQuery as a query parameter
     const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}`);
-    
+
     // Parse the JSON response
     const results = await response.json();
-  
+
     console.log(results);
   };
 
@@ -55,15 +55,13 @@ export default function Home() {
       <SideBar></SideBar>
       <main className="flex flex-col items-center justify-between p-24">
         {/* <div className="h-full w-[15%] min-w-[20rem] absolute left-0 top-0 bg-gray-200"></div> */}
-       
-        <form onSubmit={handleSearch}>
-          <label>
-            Search Notes:
-            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
-          </label>
-          <input type="submit" value="Search" />
-        </form>
 
+        {/* <form onSubmit={handleSearch}>
+          <div className="flex flex-row gap-2 rounded-full bg-[#252525] p-1 max-w-[30rem] min-w-[10rem]">
+            <img className="px-1" src="search.svg" alt="yo"></img>
+            <input type="text" placeholder="Search" className="bg-transparent text-white w-full outline-none" />
+          </div>
+        </form> */}
 
         <div>
           <h1
@@ -75,6 +73,7 @@ export default function Home() {
           >
           </h1>
         </div>
+
         <div>
           <ModifiedEditor ref={editorRef}></ModifiedEditor>
         </div>
@@ -91,8 +90,8 @@ export default function Home() {
             className="absolute right-2 top-1 h-3 w-3 rounded-full bg-red-500"
           ></button>
         </div>
-        <DesktopAudioButton editorRef={editorRef}/>
-        <MicAudioButton editorRef={editorRef}/>
+        <DesktopAudioButton editorRef={editorRef} />
+        <MicAudioButton editorRef={editorRef} />
       </main>
     </>
   );

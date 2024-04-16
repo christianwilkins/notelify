@@ -63,7 +63,7 @@ export default function LoginPage() {
 
     <div className="flex items-center justify-center  h-full">
     <div className="flex flex-col gap-3">
-      <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto max-w-sm bg-[#181818]">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold">Login</CardTitle>
         <CardDescription>Enter your email and password to login to your account</CardDescription>
