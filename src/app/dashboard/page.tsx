@@ -16,9 +16,13 @@ import { data } from './utils';
 
 const chrono = require('chrono-node');
 
+interface SearchResult {
+  section_title: string;
+  section_content: string;
+}
+
 export default function Dashboard() {
   let [searchQuery, setSearchQuery] = useState('');
-  let [searchResults, setSearchResults] = useState([]);
   let [isLoading, setIsLoading] = useState(false);
   let [hasSearched, setHasSearched] = useState(false);
 
@@ -84,8 +88,9 @@ export default function Dashboard() {
             ) : (
               Object.entries(data).map(([key, value]) => {
                 return (
-                  <div key={key}>
-                    <h2>{key}</h2>
+                  <div className="flex flex-col gap-8" key={key}>
+                    <h2 className="text-2xl font-bold">{key}</h2>
+                  <div className="flex flex-row gap-12 flex-wrap" key={key}>
                     {value.cards.map((card, index) => (
                       <Card key={index} className="w-[22rem] h-[18rem] bg-[#181818]">
                         <CardHeader>
@@ -96,6 +101,7 @@ export default function Dashboard() {
                         </CardContent>
                       </Card>
                     ))}
+                      </div>
                   </div>
                 );
               })
