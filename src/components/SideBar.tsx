@@ -34,11 +34,11 @@ export default function SideBar() {
       <div
         ref={sidebarRef}
         id="docs-sidebar"
-        className={`flex flex-col justify-between hs-overlay transition-all duration-300 transform fixed top-0 start-0 bottom-0 z-[60] min-w-[350px] w-[13%] bg-white dark:bg-[#181818] dark:border-[#262626] border-e border-gray-200 overflow-y-auto lg:end-auto lg:bottom-0 ${expanded ? "translate-x-0" : "-translate-x-full"
+        className={`flex flex-col justify-between hs-overlay transition-all duration-300 transform fixed top-0 start-0 bottom-0 z-[60] min-w-[350px] w-[15%] bg-white dark:bg-[#181818] dark:border-[#262626] border-e border-gray-200 lg:end-auto lg:bottom-0 ${expanded ? "translate-x-0" : "-translate-x-full"} scrollbar-thin scrollbar-thumb-gray-900 scrollbar-track-gray-100"
           }`}
       >
-        <nav
-          className="hs-accordion-group py-4 px-6 w-full flex flex-col flex-wrap"
+        <nav 
+          className="hs-accordion-group py-4 px-6 w-full flex flex-col flex-wrap overflow-y-scroll scrollbar-hide" // overflow-y-scroll scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-700 scrollbar-track-gray-800
           data-hs-accordion-always-open
         >
           <ul className="space-y-1.5">
